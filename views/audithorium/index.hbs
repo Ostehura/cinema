@@ -1,0 +1,34 @@
+<h1>Audithoriums</h1>
+
+<table border="1" cellpadding="8">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Capacity</th>
+      <th>Supported Formats</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each audithoriums}}
+      <tr>
+        <td>{{this.name}}</td>
+        <td>{{ this.capacity_evalueted}}</td>
+        <td>
+          <!-- Future-ready column -->
+          {{#if this.formats}}
+            {{this.formats}}
+          {{else}}
+            <em>Not specified</em>
+          {{/if}}
+        </td>
+        <td>
+          <a href="/audithorium/view/{{this.id}}">View</a>
+        </td>
+      </tr>
+    {{/each}}
+  </tbody>
+</table>
+
+<br />
+<a href="/audithorium/new">Create New Audithorium</a>

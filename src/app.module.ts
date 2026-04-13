@@ -8,6 +8,8 @@ import { AuthModule } from './auth/auth.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { LayoutInterceptor } from './auth/layout.interceptor';
 import { GuestMiddleware } from './auth/guest.middleware';
+import { AudithoriumModule } from './audithorium/audithorium.module';
+import { Audithorium } from './audithorium/audithorium.entity';
 
 @Module({
   imports: [
@@ -18,11 +20,12 @@ import { GuestMiddleware } from './auth/guest.middleware';
       username: 'postgres',
       password: 'password',
       database: 'cinema',
-      entities: [User],
+      entities: [User, Audithorium],
       synchronize: true,
     }),
     UsersModule,
     AuthModule,
+    AudithoriumModule,
   ],
   controllers: [AppController],
   providers: [
