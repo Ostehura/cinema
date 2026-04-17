@@ -4,10 +4,13 @@ import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/user.entity';
+import { Film } from './films/film.entity';
+import { FilmFormat } from './films/filmFormat.entity';
+import { FilmsModule } from './films/film.module';
 
 
 @Module({
-  imports: [UsersModule, TypeOrmModule.forRoot({
+  imports: [UsersModule, FilmsModule, TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
       port: 5432,
@@ -15,10 +18,11 @@ import { User } from './users/user.entity';
       password: 'password',
       database: 'cinema',
       entities: [
-        User
+        User, Film, FilmFormat
       ],
       synchronize: true,
     }),],  
+    
   controllers: [AppController],
   providers: [AppService],
 })
