@@ -10,6 +10,9 @@ import { LayoutInterceptor } from './auth/layout.interceptor';
 import { GuestMiddleware } from './auth/guest.middleware';
 import { AudithoriumModule } from './audithorium/audithorium.module';
 import { Audithorium } from './audithorium/audithorium.entity';
+import { Film } from './films/film.entity';
+import { FilmFormat } from './films/filmFormat.entity';
+import { FilmsModule } from './films/film.module';
 
 @Module({
   imports: [
@@ -20,12 +23,13 @@ import { Audithorium } from './audithorium/audithorium.entity';
       username: 'postgres',
       password: 'password',
       database: 'cinema',
-      entities: [User, Audithorium],
+      entities: [User, Film, FilmFormat, Audithorium],
       synchronize: true,
     }),
     UsersModule,
     AuthModule,
     AudithoriumModule,
+    FilmsModule,
   ],
   controllers: [AppController],
   providers: [
