@@ -9,7 +9,10 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { LayoutInterceptor } from './auth/layout.interceptor';
 import { GuestMiddleware } from './auth/guest.middleware';
 import { AudithoriumModule } from './audithorium/audithorium.module';
-import { Audithorium } from './audithorium/audithorium.entity';
+import {
+  Audithorium,
+  AudithoriumFormat,
+} from './audithorium/audithorium.entity';
 import { Film } from './films/film.entity';
 import { FilmFormat } from './films/filmFormat.entity';
 import { FilmsModule } from './films/film.module';
@@ -23,7 +26,7 @@ import { FilmsModule } from './films/film.module';
       username: 'postgres',
       password: 'password',
       database: 'cinema',
-      entities: [User, Film, FilmFormat, Audithorium],
+      entities: [User, Film, FilmFormat, Audithorium, AudithoriumFormat],
       synchronize: true,
     }),
     UsersModule,

@@ -15,6 +15,8 @@ import { AudithoriumService } from './audithorium.service';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { AudithotoriumDto } from './audithorium.dto';
 import type { Response } from 'express';
+import { SeansFormat } from 'src/films/filmFormat.entity';
+import { AudithoriumFormatDTO } from './audithoriumFormatsDTO';
 
 @Controller('audithorium')
 export class AudithoriumController {
@@ -28,7 +30,6 @@ export class AudithoriumController {
     audithoriums.forEach((audithorium) => {
       audithorium.capacity_evalueted = audithorium.capacity;
     });
-    console.log(audithoriums);
     return { audithoriums: audithoriums };
   }
 
@@ -40,8 +41,19 @@ export class AudithoriumController {
     const audithorium = await this.audithoriumService.getAudithoriumById(
       params.id,
     );
-    console.log(audithorium);
-    return { audithorium };
+    const resp = {
+      audithorium,
+      formats: Object.values(SeansFormat).map((seans: SeansFormat) => {
+        return {
+          name: seans,
+          selected:
+            audithorium.supportedFormat?.findIndex(
+              (element) => element.supportedFormat == seans,
+            ) != -1,
+        };
+      }),
+    };
+    return resp;
   }
 
   @Get('new')
@@ -65,7 +77,6 @@ export class AudithoriumController {
       audithoriumDTO.number_of_rows,
       audithoriumDTO.number_of_seats_in_row,
     );
-    console.log(audithorium);
     res.redirect(`/audithorium/view/${audithorium.id}`);
     return res;
   }
@@ -85,8 +96,24 @@ export class AudithoriumController {
       audithoriumDTO.number_of_rows,
       audithoriumDTO.number_of_seats_in_row,
     );
-    console.log(audithorium);
     res.redirect(`/audithorium/view/${audithorium.id}`);
+    return res;
+  }
+
+  @Post('formats/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async editAurithoriumsFormats(
+    @Param() params: { id: number },
+    @Body()
+    audithoriumDTO: AudithoriumFormatDTO,
+    @Res() res: Response,
+  ) {
+    await this.audithoriumService.modifyAudithoriumFormats(
+      params.id,
+      audithoriumDTO,
+    );
+    res.redirect(`/audithorium/view/${params.id}`);
     return res;
   }
 }

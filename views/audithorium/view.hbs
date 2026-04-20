@@ -1,3 +1,4 @@
+<a href="/audithorium"> Back to list</a>
 <h1>Audithorium: {{audithorium.name}}</h1>
 
 <style>
@@ -82,6 +83,17 @@
 
   <br /><br />
   <button type="submit">Update</button>
+</form>
+<form method="POST" action="/audithorium/formats/{{audithorium.id}}">
+   <input type="hidden" name="number_of_seats_in_row" value="{{audithorium.id}}" />
+   <label>Formtas:</label>
+  {{#each formats}}
+ <label>{{this.name}}:</label>
+  <input type="checkbox" name="formats" value="{{this.name}}" {{#if this.selected }} checked {{/if}} />
+  {{/each}}
+  <br /><br />
+  <button type="submit">Update</button>
+  
 </form>
 
 <hr />

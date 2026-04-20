@@ -16,8 +16,8 @@
         <td>{{ this.capacity_evalueted}}</td>
         <td>
           <!-- Future-ready column -->
-          {{#if this.formats}}
-            {{this.formats}}
+          {{#if this.supportedFormat}}
+            {{#each this.supportedFormat}}{{this.supportedFormat}}&nbsp;{{/each}}
           {{else}}
             <em>Not specified</em>
           {{/if}}
