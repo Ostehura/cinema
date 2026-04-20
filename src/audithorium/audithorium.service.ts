@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Audithorium, AudithoriumFormat } from './audithorium.entity';
 import { Repository } from 'typeorm';
@@ -35,6 +39,14 @@ export class AudithoriumService {
     number_of_rows: number,
     number_of_seats_in_row: number,
   ): Promise<Audithorium> {
+    if (number_of_rows < 0 || number_of_rows > 25)
+      throw new BadRequestException(
+        'Invalid number of Rows. Should in a range be 1-25.',
+      );
+    if (number_of_rows < 0 || number_of_rows > 40)
+      throw new BadRequestException(
+        'Invalid number of seats in a Rows. Should in a range be 1-40.',
+      );
     const audithorium = this.audithoriumRepository.create({
       name,
       number_of_rows,
@@ -48,6 +60,14 @@ export class AudithoriumService {
     number_of_rows: number,
     number_of_seats_in_row: number,
   ): Promise<Audithorium> {
+    if (number_of_rows < 0 || number_of_rows > 25)
+      throw new BadRequestException(
+        'Invalid number of Rows. Should in a range be 1-25.',
+      );
+    if (number_of_rows < 0 || number_of_rows > 40)
+      throw new BadRequestException(
+        'Invalid number of seats in a Rows. Should in a range be 1-40.',
+      );
     await this.audithoriumRepository.update(
       { id },
       { name, number_of_rows, number_of_seats_in_row },
