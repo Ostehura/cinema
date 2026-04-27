@@ -1,7 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { FilmFormat } from './filmFormat.entity';
 
-
 @Entity()
 export class Film {
   @PrimaryGeneratedColumn('uuid')
@@ -14,9 +13,12 @@ export class Film {
   @Column()
   director: string;
 
-  @Column({ type: 'int'})
+  @Column({ type: 'int' })
   duration: number;
 
   @OneToMany(() => FilmFormat, (filmFormat) => filmFormat.film)
   filmFormat?: FilmFormat[];
+
+  @Column()
+  description: string;
 }

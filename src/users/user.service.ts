@@ -30,7 +30,7 @@ export class UserService {
   ): Promise<User | null> {
     const user = await this.userRepository.findOne({
       where: { email },
-      select: includePassword ?{ password: true} : { password: false },
+      select: includePassword ? { password: true } : { password: false },
     });
     return user;
   }

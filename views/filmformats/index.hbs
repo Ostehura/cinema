@@ -1,0 +1,54 @@
+<h1>Film Formats</h1>
+
+<h2>Add New Format</h2>
+<form action="/filmformat" method="POST">
+  <div>
+    <label>Film ID:</label><br>
+    <input type="text" name="filmID" required>
+  </div>
+  <div>
+    <label>Format:</label><br>
+    <select name="seansFormat">
+      {{#each formatTypes}}
+      <option value="{{this}}">{{this}}</option>
+      {{/each}}
+    </select>
+  </div>
+  <div>
+    <label>Dubbing:</label><br>
+    <input type="text" name="dubbing" required>
+  </div>
+  <button type="submit" class="btn-primary">Add Format</button>
+</form>
+
+{{#if formats.length}}
+<h2>All Formats</h2>
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Film ID</th>
+      <th>Format</th>
+      <th>Dubbing</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each formats}}
+    <tr>
+      <td>{{this.id}}</td>
+      <td>{{this.filmID}}</td>
+      <td>{{this.seansFormat}}</td>
+      <td>{{this.dubbing}}</td>
+      <td>
+        <form action="/filmformat/{{this.id}}/delete" method="POST" style="display:inline;">
+          <button type="submit" class="btn-danger">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {{/each}}
+  </tbody>
+</table>
+{{else}}
+<p>No formats available.</p>
+{{/if}}

@@ -13,21 +13,25 @@ export class FilmService {
     title: string,
     director: string,
     duration: number,
+    description: string,
   ): Promise<Film> {
     const film = this.filmRepository.create({
       title,
       director,
       duration,
+      description,
     });
     return this.filmRepository.save(film);
   }
 
-  async findByTitle(
-    title: string,
-  ): Promise<Film> {
+  async findAll(): Promise<Film[]> {
+    return this.filmRepository.find({ relations: ['filmFormat'] });
+  }
+
+  async findByTitle(title: string): Promise<Film> {
     const film = await this.filmRepository.findOne({
-      where: { title }, 
-      relations: {filmFormat: true}
+      where: { title },
+      relations: { filmFormat: true },
     });
     if (!film) {
       throw new NotFoundException('Film not found');
@@ -36,7 +40,10 @@ export class FilmService {
   }
 
   async findById(id: string): Promise<Film> {
-    const film = await this.filmRepository.findOne({ where: { id }, relations: {filmFormat: true} });
+    const film = await this.filmRepository.findOne({
+      where: { id },
+      relations: { filmFormat: true },
+    });
     if (!film) {
       throw new NotFoundException('Film not found');
     }
