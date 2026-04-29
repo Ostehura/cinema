@@ -21,6 +21,8 @@ export class Showtime {
   price!: number;
   @Column({ type: 'timestamptz' })
   starttime!: Date;
+  @Column({ type: 'timestamptz' })
+  endtime!: Date;
   @ManyToOne(() => Audithorium, (audithorium) => audithorium.showtimes)
   @JoinColumn({ name: 'audithoriumId' })
   audithorium?: Audithorium;

@@ -1,0 +1,268 @@
+<h2>Select Movie & Auditorium</h2>
+
+<div class="mb-3">
+    <label class="form-label">Movie</label>
+    <input type="text" id="movieInput" class="form-control" placeholder="Type movie name">
+    <div id="movieSuggestions" class="list-group"></div>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Auditorium</label>
+    <select id="auditoriumSelect" class="form-select" disabled>
+        <option>Select movie first</option>
+    </select>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Date</label>
+     <input type="date" id="dateInput" class="form-control" placeholder="Select date:" disabled>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Select Time</label>
+
+    <div id="timeline" class="border position-relative" style="height: 960px; overflow-y: auto;">
+        <!-- hours -->
+        <div id="hours"></div>
+
+        <!-- existing shows -->
+        <div id="shows"></div>
+
+        <!-- selected marker -->
+        <div id="selection" class="position-absolute bg-primary" style="height: 4px; width: 100%; display:none;"></div>
+    </div>
+
+    <div class="mt-2">
+        Selected time: <strong id="selectedTime">None</strong>
+    </div>
+</div>
+
+<form method="POST" action="/showtime/new">
+    Film:id
+    <input type="hidden" id="filmId" name="filmId" required/>
+    Aud
+    <input type="hidden" id="audithoriumId" name="audithoriumId" required/>
+    Date
+    <input type="hidden" id="starttime" name="starttime" required/>
+    Price
+    <input type="number" id="price" name="price" min="0" required/>
+    <div id="formats">
+        
+    </div>
+    <br /><br />
+  <button type="submit">Update</button>
+</form>
+
+<script>
+const movieInput = document.getElementById('movieInput');
+const suggestions = document.getElementById('movieSuggestions');
+const auditoriumSelect = document.getElementById('auditoriumSelect');
+const dateInput = document.getElementById('dateInput');
+const formatInput = document.getElementById('formats')
+let audithoriumList = [];
+let selectedAudithorium = null;
+
+let selectedMovie = null;
+
+//time selector consts
+const timeline = document.getElementById('timeline');
+const hoursContainer = document.getElementById('hours');
+const showsContainer = document.getElementById('shows');
+const selection = document.getElementById('selection');
+const selectedTimeText = document.getElementById('selectedTime');
+const startTimeText = document.getElementById('starttime');
+
+const START_HOUR = 8;
+const END_HOUR = 24;
+const HOUR_HEIGHT = 60; // px
+
+
+// 🔎 Fetch movie suggestions
+movieInput.addEventListener('input', async () => {
+    const query = movieInput.value;
+
+    if (!query) {
+        suggestions.innerHTML = '';
+        return;
+    }
+
+    const res = await fetch(`/film/search?q=${query}`);
+    const movies = await res.json();
+
+    suggestions.innerHTML = '';
+    movies.forEach(movie => {
+        const item = document.createElement('button');
+        item.className = 'list-group-item list-group-item-action';
+        item.textContent = movie.title;
+
+        item.onclick = () => selectMovie(movie.title, movie.id);
+
+        suggestions.appendChild(item);
+    });
+});
+
+// 🎬 Movie selection
+async function selectMovie(movieTitle, movieId) {
+    selectedMovie = movieId;
+    movieInput.value = movieTitle;
+    suggestions.innerHTML = '';
+    const field = document.getElementById("filmId");
+    field.value = movieId;
+
+    // enable auditorium dropdown
+    auditoriumSelect.disabled = false;
+
+    // fetch auditoriums
+    const res = await fetch(`/showtime/audithorium/${movieId}`);
+    const auditoriums = await res.json();
+    audithoriumList = auditoriums;
+    selectAuditorium(auditoriums[0]);
+    updateAuditoriums(auditoriums);
+}
+
+// 🏛 Update auditorium list
+function updateAuditoriums(list) {
+    auditoriumSelect.innerHTML = '';
+
+    if (list.length === 0) {
+        auditoriumSelect.innerHTML = '<option>No auditoriums available</option>';
+        return;
+    }
+
+    list.forEach(aud => {
+
+        const option = document.createElement('option');
+        option.value = aud.id;
+        option.textContent = aud.name;
+        auditoriumSelect.appendChild(option);
+    });
+    auditoriumSelect.addEventListener('change', (event) => {
+    selectAuditorium(audithoriumList.find((val)=>(val.id == event.target.value)));
+    });
+}
+
+function selectAuditorium(auditorium){
+    const field = document.getElementById("audithoriumId");
+    field.value = auditorium.id;
+    selectedAudithorium = auditorium.id;
+    renderHours();
+    dateInput.disabled = false;
+    dateInput.addEventListener('change', (event) => {
+    selectDate();
+    });
+    const children = formatInput.children;
+    for(let i =  children.length - 1; i>=0; i--)
+    {
+    
+        formatInput.removeChild(children[i]);
+    }
+    for (let i = 0; i < auditorium.supportedFormat.length;i++)
+    {
+        const option = document.createElement('input');
+        option.type='radio';
+        option.name='format';
+        option.value=auditorium.supportedFormat[i].supportedFormat;
+        const label = document.createElement('label');
+        label.innerText = auditorium.supportedFormat[i].supportedFormat;
+        formatInput.appendChild(label);
+        formatInput.appendChild(option);
+    }
+
+}
+
+async function selectDate()
+{
+    const date = dateInput.value;
+    const  audithoriumId = selectedAudithorium;
+     const res = await fetch(`/showtime/shows?audithorium=${audithoriumId}&date=${date}`);
+    const shows = await res.json();
+    renderShows(shows);
+
+}
+
+
+// 🔁 Reset if movie changes manually
+movieInput.addEventListener('change', () => {
+    if (movieInput.value !== selectedMovie) {
+        auditoriumSelect.innerHTML = '<option>Select movie first</option>';
+        auditoriumSelect.disabled = true;
+    }
+});
+
+// 🕐 Render hours grid
+function renderHours() {
+    for (let h = START_HOUR; h < END_HOUR; h++) {
+        const div = document.createElement('div');
+        div.style.height = HOUR_HEIGHT + 'px';
+        div.className = 'border-top small ps-2';
+
+        div.innerHTML = `${h.toString().padStart(2,'0')}:00`;
+        hoursContainer.appendChild(div);
+    }
+}
+function DateToTimeString(date)
+{
+    const hh = String(date.getHours()).padStart(2, '0');
+    const mm = String(date.getMinutes()).padStart(2, '0');
+
+    const time = `${hh}:${mm}`;
+    return time;
+}
+// 🎬 Render existing shows
+function renderShows(shows) {
+    showsContainer.innerHTML = '';
+
+    shows.forEach(show => {
+        const start = timeToMinutes(DateToTimeString(new Date(show.starttime)));
+        const end = timeToMinutes(DateToTimeString(new Date(show.endtime)));
+        const top = ((start - START_HOUR * 60) / 60) * HOUR_HEIGHT;
+        const height = ((end - start) / 60) * HOUR_HEIGHT;
+
+        const div = document.createElement('div');
+        div.className = 'position-absolute bg-danger text-white px-1';
+        div.style.top = top + 'px';
+        div.style.height = height + 'px';
+        div.style.left = '80px';
+        div.style.right = '10px';
+
+        div.innerText = show.filmFormat.film.title;
+
+        showsContainer.appendChild(div);
+    });
+}
+
+// 🧮 Helpers
+function timeToMinutes(t) {
+    const [h, m] = t.split(':').map(Number);
+    return h * 60 + m;
+}
+
+function minutesToTime(min) {
+    const h = Math.floor(min / 60);
+    const m = min % 60;
+    return `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`;
+}
+
+// 🖱 Click selection
+timeline.addEventListener('click', (e) => {
+    const rect = timeline.getBoundingClientRect();
+    const y = e.clientY - rect.top;
+
+    const minutesFromStart = (y / HOUR_HEIGHT) * 60;
+    const totalMinutes = START_HOUR * 60 + minutesFromStart;
+
+    const rounded = Math.round(totalMinutes / 5) * 5; // snap to 5 min
+
+    const time = minutesToTime(rounded);
+
+    // show marker
+    selection.style.display = 'block';
+    selection.style.top = (y - 2) + 'px';
+
+    selectedTimeText.innerText = time;
+    const fulltime = new Date( dateInput.value);
+    fulltime.setHours(rounded/60, rounded%60);
+    startTimeText.value = fulltime.toISOString();
+});
+
+</script>

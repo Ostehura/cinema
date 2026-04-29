@@ -5,10 +5,14 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { And, DataSource, LessThan, MoreThan, Repository } from 'typeorm';
+import { And, DataSource, In, LessThan, MoreThan, Repository } from 'typeorm';
 import { Showtime } from './showtime.entity';
-import { FilmFormat } from 'src/films/filmFormat.entity';
-import { AudithoriumFormat } from 'src/audithorium/audithorium.entity';
+import { FilmFormat, SeansFormat } from 'src/films/filmFormat.entity';
+import {
+  Audithorium,
+  AudithoriumFormat,
+} from 'src/audithorium/audithorium.entity';
+
 const BUFFER_MINUTES = 10;
 
 @Injectable()
@@ -18,12 +22,17 @@ export class ShowtimeService {
   constructor(private dataSource: DataSource) {}
 
   async addShowtime(
-    filmFormatId: string,
+    filmId: string,
+    seansFormat: SeansFormat,
     audithoriumId: number,
     starttime: Date,
+    price: number,
   ) {
     if (starttime < new Date()) {
       throw new BadRequestException('Cannot schedule in the past');
+    }
+    if (price < 0) {
+      throw new BadRequestException('Price should be positive!');
     }
     const dayStart = new Date(starttime);
     dayStart.setHours(0, 0, 0, 0);
@@ -40,11 +49,10 @@ export class ShowtimeService {
           },
           order: { starttime: 'ASC' },
           relations: ['filmFormat', 'filmFormat.film'],
-          lock: { mode: 'pessimistic_write' },
         });
 
         const filmformat = await manager.findOne(FilmFormat, {
-          where: { id: filmFormatId },
+          where: { filmID: filmId, seansFormat: seansFormat },
           relations: { film: true },
         });
         if (!filmformat || !filmformat.film) {
@@ -83,8 +91,10 @@ export class ShowtimeService {
         }
         const newShowtime = manager.create(Showtime, {
           audithoriumId: audithoriumId,
-          filmFormatId: filmFormatId,
+          filmFormatId: filmformat.id,
+          price: price,
           starttime: starttime,
+          endtime: newEnd,
         });
         await manager.save(Showtime, newShowtime);
         return newShowtime;
@@ -133,5 +143,41 @@ export class ShowtimeService {
       throw new InternalServerErrorException('Something went wrong');
     }
     return true;
+  }
+
+  async getAvaiableAudithorium(filmId: string): Promise<Audithorium[]> {
+    const audithoriums = await this.dataSource.transaction(
+      async (manager): Promise<Audithorium[]> => {
+        const formats = (
+          await manager.find(FilmFormat, {
+            where: { filmID: filmId },
+          })
+        ).map((filmFormat) => {
+          return filmFormat.seansFormat;
+        });
+        const audithoriums = await manager.find(Audithorium, {
+          where: { supportedFormat: { supportedFormat: In(formats) } },
+          relations: { supportedFormat: true },
+        });
+        return audithoriums;
+      },
+    );
+    return audithoriums;
+  }
+
+  async getShowsByAudithorium(date: Date, audithoriumId: number) {
+    const dayStart = new Date(date);
+    dayStart.setHours(0, 0, 0, 0);
+
+    const dayEnd = new Date(date);
+    dayEnd.setHours(23, 59, 59, 999);
+
+    return this.showtimeRepository.find({
+      where: {
+        audithoriumId: audithoriumId,
+        starttime: And(MoreThan(dayStart), LessThan(dayEnd)),
+      },
+      relations: { filmFormat: { film: true } },
+    });
   }
 }
