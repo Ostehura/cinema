@@ -16,6 +16,8 @@ import {
 import { Film } from './films/film.entity';
 import { FilmFormat } from './films/filmFormat.entity';
 import { FilmsModule } from './films/film.module';
+import { ShowtimeModule } from './showtime/showtime.module';
+import { Showtime } from './showtime/showtime.entity';
 
 @Module({
   imports: [
@@ -26,13 +28,21 @@ import { FilmsModule } from './films/film.module';
       username: 'postgres',
       password: 'password',
       database: 'cinema',
-      entities: [User, Film, FilmFormat, Audithorium, AudithoriumFormat],
+      entities: [
+        User,
+        Film,
+        FilmFormat,
+        Audithorium,
+        AudithoriumFormat,
+        Showtime,
+      ],
       synchronize: true,
     }),
     UsersModule,
     AuthModule,
     AudithoriumModule,
     FilmsModule,
+    ShowtimeModule,
   ],
   controllers: [AppController],
   providers: [

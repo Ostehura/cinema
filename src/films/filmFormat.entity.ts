@@ -4,8 +4,10 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { Film } from './film.entity';
+import { Showtime } from 'src/showtime/showtime.entity';
 
 export enum SeansFormat {
   IMAX = 'IMAX',
@@ -30,4 +32,7 @@ export class FilmFormat {
   })
   @JoinColumn({ name: 'filmID' })
   film?: Film;
+
+  @OneToMany(() => Showtime, (showtime) => showtime.filmFormat)
+  showtimes?: Showtime[];
 }
