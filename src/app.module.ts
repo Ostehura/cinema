@@ -17,6 +17,8 @@ import { Film } from './films/film.entity';
 import { FilmFormat } from './films/filmFormat.entity';
 import { Booking } from './bookings/booking.entity';
 import { FilmsModule } from './films/film.module';
+import { ShowtimeModule } from './showtime/showtime.module';
+import { Showtime } from './showtime/showtime.entity';
 import { BookingModule } from './bookings/booking.module';
 
 @Module({
@@ -29,7 +31,14 @@ import { BookingModule } from './bookings/booking.module';
       password: 'password',
       database: 'cinema',
       entities: [
-        User, Film, FilmFormat, Audithorium, AudithoriumFormat, Booking
+        
+        User,
+        Film,
+        FilmFormat,
+        Audithorium,
+        AudithoriumFormat,
+        Showtime,
+      , Booking
       ],
       synchronize: true,
     }),
@@ -37,6 +46,7 @@ import { BookingModule } from './bookings/booking.module';
     AuthModule,
     AudithoriumModule,
     FilmsModule,
+    ShowtimeModule,
     BookingModule,
   ],
   controllers: [AppController],

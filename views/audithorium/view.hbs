@@ -86,7 +86,7 @@
 </form>
 <form method="POST" action="/audithorium/formats/{{audithorium.id}}">
    <input type="hidden" name="number_of_seats_in_row" value="{{audithorium.id}}" />
-   <label>Formtas:</label>
+   <label>Formats:</label>
   {{#each formats}}
  <label>{{this.name}}:</label>
   <input type="checkbox" name="formats" value="{{this.name}}" {{#if this.selected }} checked {{/if}} />

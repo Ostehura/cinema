@@ -1,6 +1,6 @@
 import { Film } from './film.entity';
 import { NotFoundException } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
 export class FilmService {
@@ -64,5 +64,12 @@ export class FilmService {
     if (result.affected === 0) {
       throw new NotFoundException('Film not found');
     }
+  }
+
+  async searchFilmsByName(name: string): Promise<Film[]> {
+    return await this.filmRepository.find({
+      where: { title: ILike(`%${name}%`) },
+      relations: { filmFormat: true },
+    });
   }
 }

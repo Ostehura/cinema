@@ -7,6 +7,7 @@ import {
   UseGuards,
   Render,
   Redirect,
+  Query,
 } from '@nestjs/common';
 import { FilmService } from './film.service';
 import { FilmFormatService } from './filmFormat.service';
@@ -24,6 +25,10 @@ export class FilmController {
     private readonly filmService: FilmService,
     private readonly filmFormatService: FilmFormatService,
   ) {}
+  @Get('search')
+  async getFilmByName(@Query('q') query: string) {
+    return await this.filmService.searchFilmsByName(query);
+  }
 
   @Get()
   @UseGuards(OptionalJwtAuthGuard)
