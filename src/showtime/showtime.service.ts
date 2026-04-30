@@ -27,6 +27,7 @@ export class ShowtimeService {
     audithoriumId: number,
     starttime: Date,
     price: number,
+    language: string,
   ) {
     if (starttime < new Date()) {
       throw new BadRequestException('Cannot schedule in the past');
@@ -50,9 +51,12 @@ export class ShowtimeService {
           order: { starttime: 'ASC' },
           relations: ['filmFormat', 'filmFormat.film'],
         });
-
         const filmformat = await manager.findOne(FilmFormat, {
-          where: { filmID: filmId, seansFormat: seansFormat },
+          where: {
+            filmID: filmId,
+            seansFormat: seansFormat,
+            dubbing: language,
+          },
           relations: { film: true },
         });
         if (!filmformat || !filmformat.film) {

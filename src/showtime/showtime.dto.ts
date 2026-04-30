@@ -16,4 +16,6 @@ export class CreateShowTimeDTO {
   starttime!: Date;
   @IsEnum(SeansFormat)
   format!: SeansFormat;
+  @IsString()
+  language!: string;
 }

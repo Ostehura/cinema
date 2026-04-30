@@ -46,10 +46,15 @@
     <input type="hidden" id="starttime" name="starttime" required/>
     Price
     <input type="number" id="price" name="price" min="0" required/>
-    <div id="formats">
+    <br/>
+    <select id="formats" name="format">
         
-    </div>
-    <br /><br />
+    </select>
+    <br />
+    <select id="languages" name="language">
+        
+    </select>
+    <br />
   <button type="submit">Update</button>
 </form>
 
@@ -59,9 +64,11 @@ const suggestions = document.getElementById('movieSuggestions');
 const auditoriumSelect = document.getElementById('auditoriumSelect');
 const dateInput = document.getElementById('dateInput');
 const formatInput = document.getElementById('formats')
+const languageInput = document.getElementById('languages')
 let audithoriumList = [];
 let selectedAudithorium = null;
 
+let selectedMovieId = null;
 let selectedMovie = null;
 
 //time selector consts
@@ -95,25 +102,26 @@ movieInput.addEventListener('input', async () => {
         item.className = 'list-group-item list-group-item-action';
         item.textContent = movie.title;
 
-        item.onclick = () => selectMovie(movie.title, movie.id);
+        item.onclick = () => selectMovie(movie);
 
         suggestions.appendChild(item);
     });
 });
 
 // 🎬 Movie selection
-async function selectMovie(movieTitle, movieId) {
-    selectedMovie = movieId;
-    movieInput.value = movieTitle;
+async function selectMovie(movie) {
+    selectedMovieId = movie.id;
+    selectedMovie = movie;
+    movieInput.value = movie.title;
     suggestions.innerHTML = '';
     const field = document.getElementById("filmId");
-    field.value = movieId;
+    field.value = movie.id;
 
     // enable auditorium dropdown
     auditoriumSelect.disabled = false;
 
     // fetch auditoriums
-    const res = await fetch(`/showtime/audithorium/${movieId}`);
+    const res = await fetch(`/showtime/audithorium/${movie.id}`);
     const auditoriums = await res.json();
     audithoriumList = auditoriums;
     selectAuditorium(auditoriums[0]);
@@ -158,15 +166,13 @@ function selectAuditorium(auditorium){
     }
     for (let i = 0; i < auditorium.supportedFormat.length;i++)
     {
-        const option = document.createElement('input');
-        option.type='radio';
-        option.name='format';
+        const option = document.createElement('option');
         option.value=auditorium.supportedFormat[i].supportedFormat;
-        const label = document.createElement('label');
-        label.innerText = auditorium.supportedFormat[i].supportedFormat;
-        formatInput.appendChild(label);
+        option.textContent = auditorium.supportedFormat[i].supportedFormat;
         formatInput.appendChild(option);
     }
+    formatInput.addEventListener('change', (event) => {
+   setLanguage(event.target.value)});
 
 }
 
@@ -180,10 +186,28 @@ async function selectDate()
 
 }
 
+function setLanguage(format)
+{
+    const language = selectedMovie.filmFormat.filter((element) => (element.seansFormat == format));
+    const children = languageInput.children;
+    for(let i =  children.length - 1; i>=0; i--)
+    {
+    
+        languageInput.removeChild(children[i]);
+    }
+    for (let i = 0; i < language.length;i++)
+    {
+        const option = document.createElement('option');
+        option.value=language[i].dubbing;
+        option.textContent = language[i].dubbing;
+        languageInput.appendChild(option);
+    }
+}
+
 
 // 🔁 Reset if movie changes manually
 movieInput.addEventListener('change', () => {
-    if (movieInput.value !== selectedMovie) {
+    if (movieInput.value !== selectedMovieId) {
         auditoriumSelect.innerHTML = '<option>Select movie first</option>';
         auditoriumSelect.disabled = true;
     }

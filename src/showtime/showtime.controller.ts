@@ -55,6 +55,7 @@ export class ShowtimeController {
       showtimeDTO.audithoriumId,
       new Date(showtimeDTO.starttime),
       showtimeDTO.price,
+      showtimeDTO.language,
     );
   }
 }
