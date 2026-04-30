@@ -1,0 +1,69 @@
+<h1>Edit Film</h1>
+<form action="/film/edit/{{film.id}}" method="POST">
+  <div>
+    <label>Title:</label><br>
+    <input type="text" name="title" value="{{film.title}}" required>
+  </div>
+  <div>
+    <label>Director:</label><br>
+    <input type="text" name="director" value="{{film.director}}" required>
+  </div>
+  <div>
+    <label>Duration (minutes):</label><br>
+    <input type="number" name="duration" value="{{film.duration}}" required>
+  </div>
+  <div>
+    <label>Description:</label><br>
+    <textarea name="description" rows="4" required>{{film.description}}</textarea>
+  </div>
+  <button type="submit" class="btn-primary">Update Film</button>
+  <a href="{{backUrl}}">Cancel</a>
+</form>
+
+<h2>Film Formats</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Format</th>
+      <th>Dubbing</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each formats}}
+    <tr>
+      <td>{{this.seansFormat}}</td>
+      <td>{{this.dubbing}}</td>
+      <td>
+        <form action="/film/edit/{{../film.id}}/format/{{this.id}}/delete" method="POST" style="display:inline;">
+          <button type="submit" class="btn-danger">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {{/each}}
+  </tbody>
+</table>
+
+<h3>Add New Format</h3>
+<form action="/film/edit/{{film.id}}/format" method="POST">
+  <div>
+    <label>Format:</label><br>
+    <select name="seansFormat">
+      {{#each formatTypes}}
+      <option value="{{this}}">{{this}}</option>
+      {{/each}}
+    </select>
+  </div>
+  <div>
+    <label>Dubbing:</label><br>
+    <input type="text" name="dubbing" required>
+  </div>
+  <button type="submit" class="btn-primary">Add Format</button>
+</form>
+
+<h3>Delete Film</h3>
+<form action="/film/delete/{{film.id}}" method="POST" onsubmit="return confirm('Are you sure you want to delete this film?');">
+  <button type="submit" class="btn-danger">Delete Film</button>
+</form>
+
+<p><a href="{{backUrl}}">Back to Film</a></p>

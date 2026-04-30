@@ -8,9 +8,15 @@ import { AuthModule } from './auth/auth.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { LayoutInterceptor } from './auth/layout.interceptor';
 import { GuestMiddleware } from './auth/guest.middleware';
+import { Film } from './films/film.entity';
+import { FilmFormat } from './films/filmFormat.entity';
+import { FilmsModule } from './films/film.module';
 
 @Module({
   imports: [
+    UsersModule,
+    AuthModule,
+    FilmsModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
@@ -18,12 +24,11 @@ import { GuestMiddleware } from './auth/guest.middleware';
       username: 'postgres',
       password: 'password',
       database: 'cinema',
-      entities: [User],
+      entities: [User, Film, FilmFormat],
       synchronize: true,
     }),
-    UsersModule,
-    AuthModule,
   ],
+
   controllers: [AppController],
   providers: [
     AppService,

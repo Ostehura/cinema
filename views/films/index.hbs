@@ -1,0 +1,29 @@
+<h1>Films</h1>
+<p><a href="/film/new" class="btn-primary">Add New Film</a></p>
+{{#if films.length}}
+<table>
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Director</th>
+      <th>Duration (min)</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each films}}
+    <tr>
+      <td>{{this.title}}</td>
+      <td>{{this.director}}</td>
+      <td>{{this.duration}}</td>
+      <td>
+        <a href="/film/view/{{this.id}}">View</a>
+        <a href="/film/edit/{{this.id}}">Edit</a>
+      </td>
+    </tr>
+    {{/each}}
+  </tbody>
+</table>
+{{else}}
+<p>No films available.</p>
+{{/if}}
