@@ -18,4 +18,7 @@ export class Film {
 
   @OneToMany(() => FilmFormat, (filmFormat) => filmFormat.film)
   filmFormat?: FilmFormat[];
+
+  @Column()
+  description!: string;
 }

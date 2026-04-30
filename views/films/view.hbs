@@ -1,0 +1,28 @@
+<h1>{{film.title}}</h1>
+<p><strong>Director:</strong> {{film.director}}</p>
+<p><strong>Duration:</strong> {{film.duration}} minutes</p>
+<p><strong>Description:</strong> {{film.description}}</p>
+
+<h2>Film Formats</h2>
+{{#if formats.length}}
+<table>
+  <thead>
+    <tr>
+      <th>Format</th>
+      <th>Dubbing</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each formats}}
+    <tr>
+      <td>{{this.seansFormat}}</td>
+      <td>{{this.dubbing}}</td>
+    </tr>
+    {{/each}}
+  </tbody>
+</table>
+{{else}}
+<p>No formats available.</p>
+{{/if}}
+
+<p><a href="{{backUrl}}">Back to List</a></p>

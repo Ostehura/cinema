@@ -30,4 +30,7 @@ export class FilmFormat {
   })
   @JoinColumn({ name: 'filmID' })
   film?: Film;
+
+  @Column()
+  dubbing!: string;
 }

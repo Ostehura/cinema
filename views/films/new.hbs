@@ -1,0 +1,21 @@
+<h1>Add New Film</h1>
+<form action="/film/new" method="POST">
+  <div>
+    <label>Title:</label><br>
+    <input type="text" name="title" required>
+  </div>
+  <div>
+    <label>Director:</label><br>
+    <input type="text" name="director" required>
+  </div>
+  <div>
+    <label>Duration (minutes):</label><br>
+    <input type="number" name="duration" required>
+  </div>
+  <div>
+    <label>Description:</label><br>
+    <textarea name="description" rows="4" required></textarea>
+  </div>
+  <button type="submit" class="btn-primary">Create Film</button>
+  <a href="{{backUrl}}">Cancel</a>
+</form>

@@ -13,13 +13,19 @@ export class FilmService {
     title: string,
     director: string,
     duration: number,
+    description: string,
   ): Promise<Film> {
     const film = this.filmRepository.create({
       title,
       director,
       duration,
+      description,
     });
     return this.filmRepository.save(film);
+  }
+
+  async findAll(): Promise<Film[]> {
+    return this.filmRepository.find({ relations: ['filmFormat'] });
   }
 
   async findByTitle(title: string): Promise<Film> {
