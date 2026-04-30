@@ -4,21 +4,21 @@ import { FilmFormat } from './filmFormat.entity';
 @Entity()
 export class Film {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   // @Column({ unique: true })
   @Column()
-  title: string;
+  title!: string;
 
   @Column()
-  director: string;
+  director!: string;
 
   @Column({ type: 'int' })
-  duration: number;
+  duration!: number;
 
   @OneToMany(() => FilmFormat, (filmFormat) => filmFormat.film)
   filmFormat?: FilmFormat[];
 
   @Column()
-  description: string;
+  description!: string;
 }

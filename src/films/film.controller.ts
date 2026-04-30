@@ -11,11 +11,12 @@ import {
 import { FilmService } from './film.service';
 import { FilmFormatService } from './filmFormat.service';
 import { SeansFormat } from './filmFormat.entity';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { OptionalAuthGuard } from '../auth/guards/optional-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/guards/roles.guard';
+
 import { UserRole } from '../users/user.entity';
+import { JwtAuthGuard } from 'src/auth/auth.guard';
+import { Roles } from 'src/auth/roles.decorator';
+import { RolesGuard } from 'src/auth/roles.guard';
+import { OptionalJwtAuthGuard } from 'src/auth/optionalauth.guard';
 
 @Controller('film')
 export class FilmController {
@@ -25,7 +26,7 @@ export class FilmController {
   ) {}
 
   @Get()
-  @UseGuards(OptionalAuthGuard)
+  @UseGuards(OptionalJwtAuthGuard)
   @Render('films/index')
   async listFilms() {
     const films = await this.filmService.findAll();
@@ -33,7 +34,7 @@ export class FilmController {
   }
 
   @Get('view/:id')
-  @UseGuards(OptionalAuthGuard)
+  @UseGuards(OptionalJwtAuthGuard)
   @Render('films/view')
   async viewFilm(@Param('id') id: string) {
     const film = await this.filmService.findById(id);

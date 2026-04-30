@@ -1,0 +1,18 @@
+{{#each (range 1 rows)}}
+  <div style="display: flex; margin: 5px 0;">
+    {{#each (range 1 ../seats)}}
+      <div
+        style="
+          width: 20px;
+          height: 20px;
+          border: 1px solid black;
+          margin-right: 4px;
+          text-align: center;
+          font-size: 10px;
+        "
+      >
+        {{this}}
+      </div>
+    {{/each}}
+  </div>
+{{/each}}

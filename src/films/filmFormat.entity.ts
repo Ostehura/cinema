@@ -17,20 +17,20 @@ export enum SeansFormat {
 @Entity()
 export class FilmFormat {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column()
-  filmID: string;
+  filmID!: string;
 
   @Column({ type: 'enum', enum: SeansFormat, default: SeansFormat.F2D })
-  seansFormat: SeansFormat;
+  seansFormat!: SeansFormat;
 
   @ManyToOne(() => Film, (film) => film.filmFormat, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'filmID' })
-  film: Film;
+  film?: Film;
 
   @Column()
-  dubbing: string;
+  dubbing!: string;
 }
