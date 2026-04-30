@@ -33,6 +33,9 @@ export class FilmFormat {
   @JoinColumn({ name: 'filmID' })
   film?: Film;
 
+  @Column()
+  dubbing!: string;
+
   @OneToMany(() => Showtime, (showtime) => showtime.filmFormat)
   showtimes?: Showtime[];
 }
