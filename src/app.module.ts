@@ -6,23 +6,25 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/user.entity';
 import { Film } from './films/film.entity';
 import { FilmFormat } from './films/filmFormat.entity';
+import { Booking } from './bookings/booking.entity';
 import { FilmsModule } from './films/film.module';
 
-
 @Module({
-  imports: [UsersModule, FilmsModule, TypeOrmModule.forRoot({
+  imports: [
+    UsersModule,
+    FilmsModule,
+    TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
       port: 5432,
       username: 'postgres',
       password: 'password',
       database: 'cinema',
-      entities: [
-        User, Film, FilmFormat
-      ],
+      entities: [User, Film, FilmFormat, Booking],
       synchronize: true,
-    }),],  
-    
+    }),
+  ],
+
   controllers: [AppController],
   providers: [AppService],
 })
