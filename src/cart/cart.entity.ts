@@ -37,7 +37,7 @@ export class Cart {
 
 @Entity()
 export class CartItem {
-  @PrimaryColumn()
+  @Column()
   cartId!: number;
 
   @PrimaryColumn()
