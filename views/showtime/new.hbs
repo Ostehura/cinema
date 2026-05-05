@@ -121,7 +121,7 @@ async function selectMovie(movie) {
     auditoriumSelect.disabled = false;
 
     // fetch auditoriums
-    const res = await fetch(`/showtime/audithorium/${movie.id}`);
+    const res = await fetch(`/showtime/searchaudithorium/${movie.id}`);
     const auditoriums = await res.json();
     audithoriumList = auditoriums;
     selectAuditorium(auditoriums[0]);
