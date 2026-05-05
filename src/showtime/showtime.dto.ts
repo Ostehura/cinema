@@ -20,12 +20,11 @@ export class CreateShowTimeDTO {
   language!: string;
 }
 
-export class DeleteSHowtimeForAuditoriumDTO{
+export class DeleteSHowtimeForAuditoriumDTO {
   @IsInt()
-  @Type(()=>Number)
+  @Type(() => Number)
   audithoriumId!: number;
   @IsDate()
-  @Type(()=>Date)
-  day: Date;
-
+  @Type(() => Date)
+  day!: Date;
 }

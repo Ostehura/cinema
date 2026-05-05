@@ -182,12 +182,20 @@ export class ShowtimeService {
     });
   }
 
-  async getShowtimePerAudithoriumAndDay(audithoriumId: number, date: Date):Promise<Showtime[]>
-  {
+  async getShowtimePerAudithoriumAndDay(
+    audithoriumId: number,
+    date: Date,
+  ): Promise<Showtime[]> {
     const dayStart = getDateStart(date);
 
     const dayEnd = getDateEnd(date);
 
-    return await this.showtimeRepository.find({where: {audithoriumId: audithoriumId, starttime: And(MoreThan(dayStart), LessThan(dayEnd))}, relations: {filmFormat: {film : true}}})
+    return await this.showtimeRepository.find({
+      where: {
+        audithoriumId: audithoriumId,
+        starttime: And(MoreThan(dayStart), LessThan(dayEnd)),
+      },
+      relations: { filmFormat: { film: true } },
+    });
   }
 }

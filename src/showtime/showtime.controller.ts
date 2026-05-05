@@ -10,7 +10,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ShowtimeService } from './showtime.service';
-import { CreateShowTimeDTO, DeleteSHowtimeForAuditoriumDTO } from './showtime.dto';
+import {
+  CreateShowTimeDTO,
+  DeleteSHowtimeForAuditoriumDTO,
+} from './showtime.dto';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { UserRole } from 'src/users/user.entity';
@@ -66,22 +69,43 @@ export class ShowtimeController {
   @Roles(UserRole.ADMIN)
   @Get('audithorium/:id')
   @Render('showtime/audithoriumView')
-  async getAudithoriumView( @Query('date') date: Date,@Param('id') audithoriumId: number)
-  {
+  async getAudithoriumView(
+    @Query('date') date: Date,
+    @Param('id') audithoriumId: number,
+  ) {
     date = new Date(date);
-    let yesterday = new Date();
+    const yesterday = new Date();
     yesterday.setDate(date.getDate() - 1);
-    let tommorow = new Date();
+    const tommorow = new Date();
     tommorow.setDate(date.getDate() + 1);
-    return {list: JSON.stringify(await this.showtimeService.getShowtimePerAudithoriumAndDay(audithoriumId,date)), audithoriumId: audithoriumId, date: date, yesterday: yesterday.toDateString(), tommorow: tommorow.toDateString()};
+    return {
+      list: JSON.stringify(
+        await this.showtimeService.getShowtimePerAudithoriumAndDay(
+          audithoriumId,
+          date,
+        ),
+      ),
+      audithoriumId: audithoriumId,
+      date: date,
+      yesterday: yesterday.toDateString(),
+      tommorow: tommorow.toDateString(),
+    };
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
-  @Post("/audithorium/delete")
-  async deleteShowtimesForAudithoriumAndDate(@Body() audithorium :DeleteSHowtimeForAuditoriumDTO, @Res() res: Response )
-  {
-    this.showtimeService.deleteShowtimeForAudithorium(audithorium.audithoriumId, getDateStart(audithorium.day),getDateEnd(audithorium.day));
-    return res.redirect(`/showtime/audithorium/${audithorium.audithoriumId}?date=${audithorium.day}`);
+  @Post('/audithorium/delete')
+  async deleteShowtimesForAudithoriumAndDate(
+    @Body() audithorium: DeleteSHowtimeForAuditoriumDTO,
+    @Res() res: Response,
+  ) {
+    await this.showtimeService.deleteShowtimeForAudithorium(
+      audithorium.audithoriumId,
+      getDateStart(audithorium.day),
+      getDateEnd(audithorium.day),
+    );
+    return res.redirect(
+      `/showtime/audithorium/${audithorium.audithoriumId}?date=${audithorium.day.toDateString()}`,
+    );
   }
 }
