@@ -18,6 +18,8 @@ import { FilmFormat } from './films/filmFormat.entity';
 import { FilmsModule } from './films/film.module';
 import { ShowtimeModule } from './showtime/showtime.module';
 import { Showtime } from './showtime/showtime.entity';
+import { CartModule } from './cart/cart.module';
+import { Cart, CartItem } from './cart/cart.entity';
 
 @Module({
   imports: [
@@ -35,6 +37,8 @@ import { Showtime } from './showtime/showtime.entity';
         Audithorium,
         AudithoriumFormat,
         Showtime,
+        Cart,
+        CartItem,
       ],
       synchronize: true,
     }),
@@ -43,6 +47,7 @@ import { Showtime } from './showtime/showtime.entity';
     AudithoriumModule,
     FilmsModule,
     ShowtimeModule,
+    CartModule,
   ],
   controllers: [AppController],
   providers: [

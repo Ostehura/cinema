@@ -2,10 +2,12 @@ import {
   Body,
   Controller,
   Get,
+  InternalServerErrorException,
   Param,
   Post,
   Query,
   Render,
+  Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
@@ -13,6 +15,7 @@ import { ShowtimeService } from './showtime.service';
 import {
   CreateShowTimeDTO,
   DeleteSHowtimeForAuditoriumDTO,
+  ShowTimeDTO,
 } from './showtime.dto';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { RolesGuard } from 'src/auth/roles.guard';
@@ -20,11 +23,15 @@ import { UserRole } from 'src/users/user.entity';
 import { Roles } from 'src/auth/roles.decorator';
 import { getDateEnd, getDateStart } from './helper';
 import type { Response } from 'express';
-import { Showtime } from './showtime.entity';
+import { CartService } from 'src/cart/cart.service';
+import type { RequestWithUser } from 'src/helper/requestWIthUser';
 
 @Controller('showtime')
 export class ShowtimeController {
-  constructor(private readonly showtimeService: ShowtimeService) {}
+  constructor(
+    private readonly showtimeService: ShowtimeService,
+    private cartServise: CartService,
+  ) {}
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @Get('new')
@@ -112,7 +119,51 @@ export class ShowtimeController {
 
   @Get('show/:id')
   @Render('showtime/show')
-  async getShow(@Param('id') showId: number): Promise<Showtime> {
-    return await this.showtimeService.getShowtimeId(showId);
+  async getShow(
+    @Param('id') showId: number,
+    @Req() req: RequestWithUser,
+  ): Promise<ShowTimeDTO> {
+    const show = await this.showtimeService.getShowtimeId(showId);
+    if (
+      !show.audithorium ||
+      !show.filmFormat ||
+      !show.filmFormat.film ||
+      show.filmFormat === undefined
+    ) {
+      throw new InternalServerErrorException('Something went wromng');
+    }
+    const showView: ShowTimeDTO = {
+      id: show.id,
+      filmFormatId: show.filmFormatId,
+      audithoriumId: show.audithoriumId,
+      price: show.price,
+      audithorium: show.audithorium,
+      endtime: show.endtime,
+      filmFormat: show.filmFormat,
+      starttime: show.starttime,
+      takenSeats: JSON.stringify(
+        (
+          await this.cartServise.getNotMyTickets(
+            req.user?.id ?? null,
+            req.cookies.guest_id,
+            showId,
+          )
+        )?.map((item) => {
+          return { column: item.column, row: item.row };
+        }),
+      ),
+      yourSeats: JSON.stringify(
+        (
+          await this.cartServise.getMyTickets(
+            req.user?.id ?? null,
+            req.cookies.guest_id,
+            showId,
+          )
+        )?.map((item) => {
+          return { column: item.column, row: item.row };
+        }),
+      ),
+    };
+    return showView;
   }
 }

@@ -202,7 +202,10 @@ export class ShowtimeService {
   async getShowtimeId(id: number): Promise<Showtime> {
     const show = await this.showtimeRepository.findOne({
       where: { id },
-      relations: { audithorium: true, filmFormat: { film: true } },
+      relations: {
+        audithorium: true,
+        filmFormat: { film: true },
+      },
     });
     if (!show) {
       throw new NotFoundException(`No show time found`);

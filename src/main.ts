@@ -30,5 +30,12 @@ async function bootstrap() {
   hbs.handlebars.registerHelper('isMiddle', (seatIndex, total) => {
     return seatIndex === Math.floor(total / 2);
   });
+
+  hbs.handlebars.registerHelper('eq', (lhs, rhs) => {
+    return lhs === rhs;
+  });
+  // hbs.handlebars.registerHelper('in', (lhs: any[], rhs) => {
+  //   return lhs.includes(rhs);
+  // });
 }
 bootstrap();

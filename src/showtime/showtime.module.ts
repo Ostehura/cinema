@@ -5,9 +5,15 @@ import { Showtime } from './showtime.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { FilmsModule } from 'src/films/film.module';
 import { AuthModule } from 'src/auth/auth.module';
+import { CartModule } from 'src/cart/cart.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Showtime]), FilmsModule, AuthModule],
+  imports: [
+    TypeOrmModule.forFeature([Showtime]),
+    FilmsModule,
+    AuthModule,
+    CartModule,
+  ],
   providers: [ShowtimeService],
   controllers: [ShowtimeController],
 })
