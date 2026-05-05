@@ -20,6 +20,7 @@ import { UserRole } from 'src/users/user.entity';
 import { Roles } from 'src/auth/roles.decorator';
 import { getDateEnd, getDateStart } from './helper';
 import type { Response } from 'express';
+import { Showtime } from './showtime.entity';
 
 @Controller('showtime')
 export class ShowtimeController {
@@ -107,5 +108,11 @@ export class ShowtimeController {
     return res.redirect(
       `/showtime/audithorium/${audithorium.audithoriumId}?date=${audithorium.day.toDateString()}`,
     );
+  }
+
+  @Get('show/:id')
+  @Render('showtime/show')
+  async getShow(@Param('id') showId: number): Promise<Showtime> {
+    return await this.showtimeService.getShowtimeId(showId);
   }
 }
