@@ -66,6 +66,12 @@ export class CartController {
           row: item.row,
           ticketType: item.ticketType,
           seansId: item.seansId,
+          filmname:
+            (item.showtime.filmFormat?.film?.title ?? '') +
+            ' | dubbing:' +
+            (item.showtime.filmFormat?.dubbing ?? '') +
+            ' <br/> at: ' +
+            (item.showtime.starttime.toLocaleString() ?? ''),
           subototalForamted: new Money(item.showtime.price, 'PLN')
             .multiply(TicketFare(item.ticketType))
             .toString(),

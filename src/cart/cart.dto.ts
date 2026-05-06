@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsEnum, IsInt } from 'class-validator';
+import { IsEnum, IsInt, IsString } from 'class-validator';
 import { TicketType } from './cart.entity';
 
 export class CartDto {
@@ -40,6 +40,8 @@ export class CartItemViewDto {
   subototalForamted!: string;
   @IsEnum(TicketType)
   ticketType!: TicketType;
+  @IsString()
+  filmname!: string;
 }
 
 export class CartViewDto {
