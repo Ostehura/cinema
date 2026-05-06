@@ -6,7 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Not, Repository } from 'typeorm';
+import { IsNull, Not, Repository } from 'typeorm';
 import { Cart, CartItem } from './cart.entity';
 import { CartDto, CartUpdateDto } from './cart.dto';
 
@@ -137,7 +137,10 @@ export class CartService {
       return;
     }
     for (const item of guestCart.cartItems) {
-      await this.addOrUpdateItem(userCart.id, item);
+      await this.cartItemRepository.update(
+        { seansId: item.seansId, row: item.row, column: item.column },
+        { cartId: userCart.id },
+      );
     }
 
     await this.deleteGuestCart(guestCart.guestId);
@@ -247,7 +250,10 @@ export class CartService {
   ) {
     if (userId) {
       const seats = await this.cartItemRepository.find({
-        where: { cart: { user: { id: Not(userId) } }, seansId: seansId },
+        where: [
+          { cart: { user: { id: Not(userId) } }, seansId: seansId },
+          { cart: { user: IsNull() } },
+        ],
       });
       if (!seats) {
         throw new NotFoundException('Not found your tickets');
@@ -255,7 +261,10 @@ export class CartService {
       return seats;
     } else if (guestId) {
       const seats = await this.cartItemRepository.find({
-        where: { cart: { guestId: Not(guestId) }, seansId: seansId },
+        where: [
+          { cart: { guestId: IsNull() }, seansId: seansId },
+          { cart: { guestId: Not(guestId) }, seansId: seansId },
+        ],
       });
       if (!seats) {
         throw new NotFoundException('Not found your tickets');

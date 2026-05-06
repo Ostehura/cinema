@@ -25,6 +25,7 @@ import { getDateEnd, getDateStart } from './helper';
 import type { Response } from 'express';
 import { CartService } from 'src/cart/cart.service';
 import type { RequestWithUser } from 'src/helper/requestWIthUser';
+import { OptionalJwtAuthGuard } from 'src/auth/optionalauth.guard';
 
 @Controller('showtime')
 export class ShowtimeController {
@@ -117,6 +118,7 @@ export class ShowtimeController {
     );
   }
 
+  @UseGuards(OptionalJwtAuthGuard)
   @Get('show/:id')
   @Render('showtime/show')
   async getShow(
@@ -144,7 +146,7 @@ export class ShowtimeController {
       takenSeats: JSON.stringify(
         (
           await this.cartServise.getNotMyTickets(
-            req.user?.id ?? null,
+            req.user?.userId ?? null,
             req.cookies.guest_id,
             showId,
           )
@@ -155,7 +157,7 @@ export class ShowtimeController {
       yourSeats: JSON.stringify(
         (
           await this.cartServise.getMyTickets(
-            req.user?.id ?? null,
+            req.user?.userId ?? null,
             req.cookies.guest_id,
             showId,
           )

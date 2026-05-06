@@ -3,7 +3,6 @@ import {
   Body,
   Controller,
   Get,
-  InternalServerErrorException,
   Post,
   Redirect,
   Render,
@@ -34,7 +33,7 @@ export class CartController {
   @UseGuards(OptionalJwtAuthGuard)
   async addToCart(@Req() req: RequestWithUser, @Body() dto: CartDto) {
     return await this.cartService.addProductToCart(
-      req.user?.id ?? null,
+      req.user?.userId ?? null,
       req.cookies.guest_id,
       dto,
     );
@@ -43,42 +42,38 @@ export class CartController {
   @Render('cart')
   @UseGuards(OptionalJwtAuthGuard)
   async getCart(@Req() req: RequestWithUser): Promise<CartViewDto> {
-    try {
-      const cart = await this.cartService.getCart(
-        req.user?.id ?? null,
-        req.cookies.guest_id,
-      );
-      if (!cart || !cart.cartItems) {
-        return { id: -1, totalFormated: new Money(0, 'PLN').toString() };
-      }
-      let total = new Money(0, 'PLN');
-      for (let i = 0; i < cart.cartItems.length; i++) {
-        total = total.add(
-          new Money(cart.cartItems[i].showtime.price, 'PLN').multiply(
-            TicketFare(cart.cartItems[i].ticketType),
-          ),
-        );
-      }
-      const res: CartViewDto = {
-        id: cart.id,
-        totalFormated: total.toString(),
-        cartItems: cart.cartItems.map((item: CartItem) => {
-          const cartItemFormated: CartItemViewDto = {
-            column: item.column,
-            row: item.row,
-            ticketType: item.ticketType,
-            seansId: item.seansId,
-            subototalForamted: new Money(item.showtime.price, 'PLN')
-              .multiply(TicketFare(item.ticketType))
-              .toString(),
-          };
-          return cartItemFormated;
-        }),
-      };
-      return res;
-    } catch (e: any) {
-      throw new InternalServerErrorException('Bad request');
+    const cart = await this.cartService.getCart(
+      req.user?.userId ?? null,
+      req.cookies.guest_id,
+    );
+    if (!cart || !cart.cartItems) {
+      return { id: -1, totalFormated: new Money(0, 'PLN').toString() };
     }
+    let total = new Money(0, 'PLN');
+    for (let i = 0; i < cart.cartItems.length; i++) {
+      total = total.add(
+        new Money(cart.cartItems[i].showtime.price, 'PLN').multiply(
+          TicketFare(cart.cartItems[i].ticketType),
+        ),
+      );
+    }
+    const res: CartViewDto = {
+      id: cart.id,
+      totalFormated: total.toString(),
+      cartItems: cart.cartItems.map((item: CartItem) => {
+        const cartItemFormated: CartItemViewDto = {
+          column: item.column,
+          row: item.row,
+          ticketType: item.ticketType,
+          seansId: item.seansId,
+          subototalForamted: new Money(item.showtime.price, 'PLN')
+            .multiply(TicketFare(item.ticketType))
+            .toString(),
+        };
+        return cartItemFormated;
+      }),
+    };
+    return res;
   }
 
   @Post('remove')
@@ -90,7 +85,7 @@ export class CartController {
   ) {
     try {
       return await this.cartService.deleteCart(
-        req.user?.id ?? null,
+        req.user?.userId ?? null,
         req.cookies.guest_id,
         dto,
       );
@@ -103,19 +98,20 @@ export class CartController {
   @Redirect('/')
   @UseGuards(OptionalJwtAuthGuard)
   async merge(@Req() req: RequestWithUser) {
-    if (!req.user || !req.user.id) {
+    if (!req.user || !req.user.userId) {
       throw new BadRequestException('');
     }
     await this.cartService.mergeGuestCartIntoUser(
       req.cookies.guest_id,
-      req.user.id ?? null,
+      req.user.userId ?? null,
     );
   }
   @Redirect('/cart')
   @Post('update')
+  @UseGuards(OptionalJwtAuthGuard)
   async uodateItem(@Req() req: RequestWithUser, @Body() dto: CartUpdateDto) {
     await this.cartService.updateItem(
-      req.user?.id ?? null,
+      req.user?.userId ?? null,
       req.cookies.guest_id,
       dto,
     );
