@@ -9,7 +9,6 @@ import type { Request } from 'express';
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor() {
     super({
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       jwtFromRequest: ExtractJwt.fromExtractors([
         (req: Request): string | null => {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-return

@@ -6,15 +6,19 @@ import {
   Body,
   UseGuards,
   Delete,
-  Request
+  Request,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { BookingService } from './booking.service';
 import { Booking } from './booking.entity';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/guards/roles.guard';
 import { UserRole } from '../users/user.entity';
-import type { RequestWithUser } from 'src/helper/requestWIthUser'; 
+import { JwtAuthGuard } from '../auth/auth.guard';
+import { Roles } from '../auth/roles.decorator';
+import { RolesGuard } from '../auth/roles.guard';
+
+interface RequestWithUser {
+  user?: { userId: string; role: string };
+}
 
 @Controller('booking')
 export class BookingController {
@@ -29,7 +33,7 @@ export class BookingController {
 
   @Get('user/:userId')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN,)
+  @Roles(UserRole.ADMIN)
   async getBookingsByUser(@Param('userId') userId: string): Promise<Booking[]> {
     return this.bookingService.findByUserId(userId);
   }
@@ -46,37 +50,46 @@ export class BookingController {
   async createBooking(
     @Body()
     body: {
-      seansID: string;
+      showtimeID: number;
       amount: number;
       amountReduced: number;
-      dateTime: string;
+      datetime: string;
       userID?: string;
       guestEmail?: string;
+      glasses?: number;
     },
   ): Promise<Booking> {
     return this.bookingService.create(
-      body.seansID,
+      body.showtimeID,
       body.amount,
       body.amountReduced,
-      new Date(body.dateTime),
+      new Date(body.datetime),
       body.userID,
       body.guestEmail,
+      body.glasses,
     );
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.CUSTOMER)
-  
-  async deleteBooking(@Param('id') id: string, @Request() req: RequestWithUser): Promise<{ message: string }> {
+  async deleteBooking(
+    @Param('id') id: string,
+    @Request() req: RequestWithUser,
+  ): Promise<{ message: string }> {
     const booking = await this.bookingService.findById(id);
-    if (req.user.role == UserRole.ADMIN){
+    if (!req.user) {
+      throw new UnauthorizedException('User have no access to page!');
+    }
+    if (String(req.user.role) === String(UserRole.ADMIN)) {
+      await this.bookingService.delete(id);
+    } else if (
+      String(req.user.role) === String(UserRole.CUSTOMER) &&
+      booking.userID === req.user.userId
+    ) {
       await this.bookingService.delete(id);
     }
-    else if (req.user.role == UserRole.CUSTOMER && booking.userId == req.user.id && booking.datetime){ // 
-      await this.bookingService.delete(id);
-    }
-      
+
     return { message: 'Booking deleted successfully' };
   }
 }

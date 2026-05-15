@@ -7,14 +7,13 @@ import {
   Render,
   Request,
   Res,
-  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import type { Response } from 'express';
 import { JwtAuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 import { OptionalJwtAuthGuard } from './optionalauth.guard';
-import { User } from 'src/users/user.entity';
+import { UserPayload } from 'src/helper/requestWIthUser';
 import type { RequestWithUser } from 'src/helper/requestWIthUser';
 
 @Controller('auth')
@@ -57,10 +56,7 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
-  getProfile(@Request() req: RequestWithUser): User {
-    if (!req.user) {
-      throw new UnauthorizedException('User have no access to page!');
-    }
+  getProfile(@Request() req: RequestWithUser): UserPayload | undefined {
     return req.user;
   }
 

@@ -15,21 +15,23 @@ export class BookingService {
   ) {}
 
   async findAll(): Promise<Booking[]> {
-    return this.bookingRepository.find({ relations: ['user', 'seans'] });
+    return this.bookingRepository.find({
+      relations: ['user', 'showtime', 'tickets'],
+    });
   }
 
   async findByUserId(userID: string): Promise<Booking[]> {
     return this.bookingRepository.find({
       where: { userID },
-      relations: ['seans'],
-      order: { dateTime: 'ASC' },
+      relations: ['showtime', 'tickets'],
+      order: { datetime: 'ASC' },
     });
   }
 
   async findById(id: string): Promise<Booking> {
     const booking = await this.bookingRepository.findOne({
       where: { id },
-      relations: ['user', 'seans'],
+      relations: ['user', 'showtime', 'tickets'],
     });
     if (!booking) {
       throw new NotFoundException('Booking not found');
@@ -38,12 +40,13 @@ export class BookingService {
   }
 
   async create(
-    seansID: string,
+    showtimeID: number,
     amount: number,
     amountReduced: number,
-    dateTime: Date,
+    datetime: Date,
     userID?: string,
     guestEmail?: string,
+    glasses?: number,
   ): Promise<Booking> {
     if (amount < 1 || amount > 4) {
       throw new BadRequestException('Amount must be between 1 and 4');
@@ -57,10 +60,11 @@ export class BookingService {
     const booking = this.bookingRepository.create({
       userID,
       guestEmail,
-      seansID,
+      showtimeID,
       amount,
       amountReduced,
-      dateTime,
+      datetime,
+      glasses,
     });
     return this.bookingRepository.save(booking);
   }
