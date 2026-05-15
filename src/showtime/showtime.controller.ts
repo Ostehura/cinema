@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Query,
+  Redirect,
   Render,
   Req,
   Res,
@@ -60,6 +61,7 @@ export class ShowtimeController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @Post('new')
+  @Redirect('/showtime/new')
   async createShowtime(
     @Body()
     showtimeDTO: CreateShowTimeDTO,
@@ -83,9 +85,9 @@ export class ShowtimeController {
     @Param('id') audithoriumId: number,
   ) {
     date = new Date(date);
-    const yesterday = new Date();
+    const yesterday = new Date(date);
     yesterday.setDate(date.getDate() - 1);
-    const tommorow = new Date();
+    const tommorow = new Date(date);
     tommorow.setDate(date.getDate() + 1);
     return {
       list: JSON.stringify(
@@ -167,5 +169,15 @@ export class ShowtimeController {
       ),
     };
     return showView;
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @Get('show/:id/delete')
+  async deleteShow(@Param('id') showId: number, @Res() res: Response) {
+    const show = await this.showtimeService.deleteShowtime(showId);
+    res.redirect(
+      `/showtime/audithorium/${show.audithoriumId}?date=${show.starttime.toDateString()}`,
+    );
   }
 }

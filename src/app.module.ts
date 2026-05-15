@@ -20,6 +20,7 @@ import { ShowtimeModule } from './showtime/showtime.module';
 import { Showtime } from './showtime/showtime.entity';
 import { CartModule } from './cart/cart.module';
 import { Cart, CartItem } from './cart/cart.entity';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { Cart, CartItem } from './cart/cart.entity';
     FilmsModule,
     ShowtimeModule,
     CartModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [

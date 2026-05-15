@@ -115,7 +115,7 @@ export class ShowtimeService {
       where: { audithoriumId: audithoriumId },
     });
   }
-  async deleteShowtime(id: number): Promise<boolean> {
+  async deleteShowtime(id: number): Promise<Showtime> {
     const showtime = await this.showtimeRepository.findOne({ where: { id } });
     if (!showtime) {
       throw new NotFoundException('Showtime does not exist');
@@ -124,7 +124,7 @@ export class ShowtimeService {
     if (!res) {
       throw new InternalServerErrorException('Something went wrong');
     }
-    return true;
+    return showtime;
   }
 
   async deleteShowtimeForAudithorium(

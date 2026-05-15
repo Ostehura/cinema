@@ -252,7 +252,7 @@ export class CartService {
       const seats = await this.cartItemRepository.find({
         where: [
           { cart: { user: { id: Not(userId) } }, seansId: seansId },
-          { cart: { user: IsNull() } },
+          { cart: { user: IsNull() }, seansId: seansId },
         ],
       });
       if (!seats) {

@@ -75,8 +75,17 @@ function renderShows(shows) {
         div.style.right = '10px';
 
         div.innerText = show.filmFormat.film.title;
-
         showsContainer.appendChild(div);
+        const linkToShow = document.createElement('a');
+        linkToShow.href = `/showtime/show/${show.id}`;
+        linkToShow.innerText = 'View show';
+        linkToShow.className='btn btn-primary';
+        const deleteToShow = document.createElement('a');
+        deleteToShow.href = `/showtime/show/${show.id}/delete`;
+        deleteToShow.innerText = 'Delete show';
+        deleteToShow.classList='btn btn-warning';
+        div.appendChild(linkToShow);
+        div.appendChild(deleteToShow);
     });
 }
 
