@@ -27,11 +27,13 @@ import type { Response } from 'express';
 import { CartService } from 'src/cart/cart.service';
 import type { RequestWithUser } from 'src/helper/requestWIthUser';
 import { OptionalJwtAuthGuard } from 'src/auth/optionalauth.guard';
+import { FilmService } from 'src/films/film.service';
 
 @Controller('showtime')
 export class ShowtimeController {
   constructor(
     private readonly showtimeService: ShowtimeService,
+    private readonly filmService: FilmService,
     private cartServise: CartService,
   ) {}
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -179,5 +181,33 @@ export class ShowtimeController {
     res.redirect(
       `/showtime/audithorium/${show.audithoriumId}?date=${show.starttime.toDateString()}`,
     );
+  }
+
+  @UseGuards(OptionalJwtAuthGuard)
+  @Render('showtime/allShowtimePage')
+  @Get()
+  async getShowPage(@Query('date') rowDate?: string) {
+    let date;
+    if (rowDate) {
+      date = new Date(rowDate);
+    } else {
+      date = new Date();
+    }
+    const weekDates: { title: string; url: string }[] = [];
+    for (let i = 0; i <= 7; i++) {
+      const day = new Date();
+      day.setDate(day.getDate() + i);
+      weekDates.push({
+        title: day.toLocaleDateString('pl-PL', {
+          day: '2-digit',
+          month: '2-digit',
+        }),
+        url: day.toDateString(),
+      });
+    }
+    return {
+      days: weekDates,
+      films: await this.filmService.findAllFilmsWithSeansByDay(date),
+    };
   }
 }

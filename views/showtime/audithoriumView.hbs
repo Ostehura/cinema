@@ -74,7 +74,7 @@ function renderShows(shows) {
         div.style.left = '80px';
         div.style.right = '10px';
 
-        div.innerText = show.filmFormat.film.title;
+        div.innerText = show.filmFormat.film.title + "|" +show.filmFormat.dubbing+"|"+show.filmFormat.seansFormat;
         showsContainer.appendChild(div);
         const linkToShow = document.createElement('a');
         linkToShow.href = `/showtime/show/${show.id}`;

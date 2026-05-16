@@ -1,7 +1,8 @@
 import { Film } from './film.entity';
 import { NotFoundException } from '@nestjs/common';
-import { ILike, Repository } from 'typeorm';
+import { Between, ILike, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { getDateEnd, getDateStart } from 'src/showtime/helper';
 
 export class FilmService {
   constructor(
@@ -70,6 +71,21 @@ export class FilmService {
     return await this.filmRepository.find({
       where: { title: ILike(`%${name}%`) },
       relations: { filmFormat: true },
+    });
+  }
+
+  async findAllFilmsWithSeansByDay(date: Date): Promise<Film[]> {
+    const today = getDateStart(date);
+    const weekEnd = getDateEnd(date);
+
+    return this.filmRepository.find({
+      relations: { filmFormat: { showtimes: true } },
+      where: {
+        filmFormat: { showtimes: { starttime: Between(today, weekEnd) } },
+      },
+      order: {
+        filmFormat: { showtimes: { starttime: 'ASC' } },
+      },
     });
   }
 }

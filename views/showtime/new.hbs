@@ -164,6 +164,12 @@ function selectAuditorium(auditorium){
     
         formatInput.removeChild(children[i]);
     }
+    
+    const emptyOption = document.createElement('option');
+    emptyOption.value="-";
+    emptyOption.textContent = "Select format";
+    formatInput.appendChild(emptyOption);
+    
     for (let i = 0; i < auditorium.supportedFormat.length;i++)
     {
         const option = document.createElement('option');
