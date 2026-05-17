@@ -103,7 +103,7 @@ export class CartService {
       column: product.column,
       row: product.row,
     });
-    await this.cartItemRepository.save(item);
+    await this.cartItemRepository.insert(item);
     return item;
   }
 
@@ -162,7 +162,7 @@ export class CartService {
       row: product.row,
       seansId: product.seansId,
     });
-    await this.cartItemRepository.save(cartItem);
+    await this.cartItemRepository.insert(cartItem);
     return true;
   }
 

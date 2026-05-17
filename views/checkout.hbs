@@ -30,22 +30,7 @@
               </td>
 
               <td class="text-center">
-                <form
-                  method="POST"
-                  action="/cart/update"
-                  class="d-flex justify-content-center gap-2"
-                >
-                  <input type="hidden" name="column" value="{{this.column}}" />
-                  <input type="hidden" name="row" value="{{this.row}}" />
-                  <input type="hidden" name="seansId" value="{{this.seansId}}" />
-                  <select name="ticketType" id="ticketType">
-                    <option value="full" {{#if (eq this.ticketType "full")}}selected{{/if}}>Full</option>
-                    <option value="reduced" {{#if (eq this.ticketType "reduced")}}selected{{/if}}>Reduced</option>
-                  </select>
-                  <button class="btn btn-outline-secondary btn-sm" type="submit">
-                    Update
-                  </button>
-                </form>
+                {{this.ticketType}}
               </td>
 
               <td class="text-end fw-semibold">
@@ -53,18 +38,6 @@
               </td>
 
               <td class="text-end">
-                <form method="POST" action="/cart/remove">
-                  <input type="hidden" name="column" value="{{this.column}}" />
-                  <input type="hidden" name="row" value="{{this.row}}" />
-                  <input type="hidden" name="seansId" value="{{this.seansId}}" />
-                  <button
-                    type="submit"
-                    class="btn btn-outline-danger btn-sm"
-                    title="Remove"
-                  >
-                    ✕
-                  </button>
-                </form>
               </td>
             </tr>
           {{/each}}
@@ -80,16 +53,17 @@
               <span>Total</span>
               <span>{{totalFormated}}</span>
             </h5>
-             
-              <a
+             <form method="post" action="/cart/place">
+             {{#if logged_in}}{{else}}Email:{{/if}}
+             <input type={{#if logged_in}}"hidden"{{else}}"text"{{/if}} id="guest_email" name="guest_email"  {{#if logged_in}}{{else}}required{{/if}}/>
+              <button
                 type="submit"
                 class="btn btn-primary w-100 mt-3"
                 title=" Proceed to Checkout"
-                href="/cart/place"
               >
                 Proceed to Checkout
-              </a>
-               
+              </button>
+               </form>
           </div>
         </div>
       </div>

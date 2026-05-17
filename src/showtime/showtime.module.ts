@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { FilmsModule } from 'src/films/film.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { CartModule } from 'src/cart/cart.module';
+import { BookingModule } from 'src/bookings/booking.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { CartModule } from 'src/cart/cart.module';
     FilmsModule,
     AuthModule,
     CartModule,
+    BookingModule,
   ],
   providers: [ShowtimeService],
   controllers: [ShowtimeController],

@@ -1,7 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Ticket, TicketType } from './ticket.entity';
+import { Ticket } from './ticket.entity';
+import { TicketType } from 'src/cart/cart.entity';
 
 @Injectable()
 export class TicketService {
@@ -21,16 +22,16 @@ export class TicketService {
     });
   }
 
-  async findById(id: string): Promise<Ticket> {
-    const ticket = await this.ticketRepository.findOne({
-      where: { id },
-      relations: ['booking', 'showtime'],
-    });
-    if (!ticket) {
-      throw new NotFoundException('Ticket not found');
-    }
-    return ticket;
-  }
+  // async findById(id: string): Promise<Ticket> {
+  //   const ticket = await this.ticketRepository.findOne({
+  //     where: { id },
+  //     relations: ['booking', 'showtime'],
+  //   });
+  //   if (!ticket) {
+  //     throw new NotFoundException('Ticket not found');
+  //   }
+  //   return ticket;
+  // }
 
   async create(
     bookingID: string,
@@ -54,5 +55,10 @@ export class TicketService {
     if (result.affected === 0) {
       throw new NotFoundException('Ticket not found');
     }
+  }
+  async getTakenSeatsPerShowtime(showtimeId: number) {
+    return await this.ticketRepository.find({
+      where: { showtimeID: showtimeId },
+    });
   }
 }

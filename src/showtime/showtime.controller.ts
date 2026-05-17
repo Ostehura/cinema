@@ -28,6 +28,7 @@ import { CartService } from 'src/cart/cart.service';
 import type { RequestWithUser } from 'src/helper/requestWIthUser';
 import { OptionalJwtAuthGuard } from 'src/auth/optionalauth.guard';
 import { FilmService } from 'src/films/film.service';
+import { TicketService } from 'src/ticket/ticket.service';
 
 @Controller('showtime')
 export class ShowtimeController {
@@ -35,6 +36,7 @@ export class ShowtimeController {
     private readonly showtimeService: ShowtimeService,
     private readonly filmService: FilmService,
     private cartServise: CartService,
+    private readonly ticketService: TicketService,
   ) {}
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
@@ -138,6 +140,23 @@ export class ShowtimeController {
     ) {
       throw new InternalServerErrorException('Something went wromng');
     }
+    const takenSeats = (
+      await this.cartServise.getNotMyTickets(
+        req.user?.userId ?? null,
+        req.cookies.guest_id,
+        showId,
+      )
+    )
+      ?.map((item) => {
+        return { column: item.column, row: item.row };
+      })
+      .concat(
+        (await this.ticketService.getTakenSeatsPerShowtime(show.id))?.map(
+          (item) => {
+            return { column: item.seatNumber, row: item.seatRow };
+          },
+        ),
+      );
     const showView: ShowTimeDTO = {
       id: show.id,
       filmFormatId: show.filmFormatId,
@@ -147,17 +166,7 @@ export class ShowtimeController {
       endtime: show.endtime,
       filmFormat: show.filmFormat,
       starttime: show.starttime,
-      takenSeats: JSON.stringify(
-        (
-          await this.cartServise.getNotMyTickets(
-            req.user?.userId ?? null,
-            req.cookies.guest_id,
-            showId,
-          )
-        )?.map((item) => {
-          return { column: item.column, row: item.row };
-        }),
-      ),
+      takenSeats: JSON.stringify(takenSeats),
       yourSeats: JSON.stringify(
         (
           await this.cartServise.getMyTickets(
