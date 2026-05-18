@@ -172,6 +172,7 @@ export class CartController {
   }
 
   @Post('place')
+  @Redirect('/booking/my')
   @UseGuards(OptionalJwtAuthGuard)
   async PlaceOrder(
     @Req() req: RequestWithUser,

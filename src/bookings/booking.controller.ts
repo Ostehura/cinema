@@ -38,6 +38,18 @@ export class BookingController {
     return this.bookingService.findByUserId(userId);
   }
 
+  @Get('my')
+  @UseGuards(JwtAuthGuard)
+  async getUserBookings(
+    @Param('userId') userId: string,
+    @Request() req: RequestWithUser,
+  ): Promise<Booking[]> {
+    if (!req.user) {
+      throw new UnauthorizedException();
+    }
+    return this.bookingService.findByUserId(req.user.userId);
+  }
+
   @Get(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.CUSTOMER)

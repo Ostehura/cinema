@@ -89,7 +89,7 @@ export class BookingService {
     if (!userId && !guestId) {
       throw new UnauthorizedException('User unauthorized');
     }
-    if (guestId && !guestEmail) {
+    if (!userId && guestId && !guestEmail) {
       throw new BadRequestException('Email is required to place booking.');
     }
     const booking: Booking[] = await this.dataSource.transaction(
