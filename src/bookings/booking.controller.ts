@@ -43,11 +43,18 @@ export class BookingController {
   async getUserBookings(
     @Param('userId') userId: string,
     @Request() req: RequestWithUser,
-  ): Promise<Booking[]> {
+  ): Promise<{ future: Booking[]; past: Booking[] }> {
     if (!req.user) {
       throw new UnauthorizedException();
     }
-    return this.bookingService.findByUserId(req.user.userId);
+    const bookings = await this.bookingService.findByUserId(req.user.userId);
+    const curent = bookings.filter((booking) => {
+      return booking.showtime.starttime >= new Date();
+    });
+    const past = bookings.filter((booking) => {
+      return booking.showtime.starttime < new Date();
+    });
+    return { future: curent, past: past };
   }
 
   @Get(':id')

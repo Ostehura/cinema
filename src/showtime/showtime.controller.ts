@@ -196,7 +196,7 @@ export class ShowtimeController {
   @Render('showtime/allShowtimePage')
   @Get()
   async getShowPage(@Query('date') rowDate?: string) {
-    let date;
+    let date: Date;
     if (rowDate) {
       date = new Date(rowDate);
     } else {

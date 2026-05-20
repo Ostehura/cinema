@@ -21,7 +21,7 @@
 <div class="mb-3">
     <label class="form-label">Select Time</label>
 
-    <div id="timeline" class="border position-relative" style="height: 960px; overflow-y: auto;">
+    <div id="timeline" class="border position-relative" style="height: 960px; overflow-y: none;">
         <!-- hours -->
         <div id="hours"></div>
 
@@ -38,11 +38,8 @@
 </div>
 
 <form method="POST" action="/showtime/new">
-    Film:id
     <input type="hidden" id="filmId" name="filmId" required/>
-    Aud
     <input type="hidden" id="audithoriumId" name="audithoriumId" required/>
-    Date
     <input type="hidden" id="starttime" name="starttime" required/>
     Price
     <input type="number" id="price" name="price" min="0" required/>
@@ -221,6 +218,7 @@ movieInput.addEventListener('change', () => {
 
 // 🕐 Render hours grid
 function renderHours() {
+    hoursContainer.innerHTML = '';
     for (let h = START_HOUR; h < END_HOUR; h++) {
         const div = document.createElement('div');
         div.style.height = HOUR_HEIGHT + 'px';
