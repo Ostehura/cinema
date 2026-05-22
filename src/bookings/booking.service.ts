@@ -1,11 +1,9 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Booking } from './booking.entity';
+import { Showtime } from '../showtime/showtime.entity';
+import { User } from '../users/user.entity';
 
 @Injectable()
 export class BookingService {
@@ -15,15 +13,13 @@ export class BookingService {
   ) {}
 
   async findAll(): Promise<Booking[]> {
-    return this.bookingRepository.find({
-      relations: ['user', 'showtime', 'tickets'],
-    });
+    return this.bookingRepository.find({ relations: ['user', 'showtime'] });
   }
 
   async findByUserId(userID: string): Promise<Booking[]> {
     return this.bookingRepository.find({
       where: { userID },
-      relations: ['showtime', 'tickets'],
+      relations: ['showtime'],
       order: { datetime: 'ASC' },
     });
   }
@@ -31,12 +27,34 @@ export class BookingService {
   async findById(id: string): Promise<Booking> {
     const booking = await this.bookingRepository.findOne({
       where: { id },
-      relations: ['user', 'showtime', 'tickets'],
+      relations: ['user', 'showtime'],
     });
     if (!booking) {
       throw new NotFoundException('Booking not found');
     }
     return booking;
+  }
+
+  async searchBookings(options: { userID?: string; guestEmail?: string; date?: Date }): Promise<Booking[]> {
+    const query = this.bookingRepository.createQueryBuilder('booking')
+      .leftJoinAndSelect('booking.user', 'user')
+      .leftJoinAndSelect('booking.showtime', 'showtime');
+
+    if (options.userID) {
+      query.andWhere('booking.userID = :userID', { userID: options.userID });
+    }
+    if (options.guestEmail) {
+      query.andWhere('booking.guestEmail = :guestEmail', { guestEmail: options.guestEmail });
+    }
+    if (options.date) {
+      const startOfDay = new Date(options.date);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(options.date);
+      endOfDay.setHours(23, 59, 59, 999);
+      query.andWhere('showtime.starttime BETWEEN :start AND :end', { start: startOfDay, end: endOfDay });
+    }
+
+    return query.getMany();
   }
 
   async create(
