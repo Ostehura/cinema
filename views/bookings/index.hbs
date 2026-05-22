@@ -76,7 +76,7 @@
                 
                 <div class="mb-2">
                   <p class="mb-1"><strong>Tickets:</strong> {{this.amount}} Full, {{this.amountReduced}} Reduced</p>
-                  <p class="mb-1"><strong>Total:</strong> {{this.amount + this.amountReduced}} tickets</p>
+                  {{!-- <p class="mb-1"><strong>Total:</strong> {{this.amount}} {{this.amountReduced}} tickets</p> --}}
                 </div>
                 
                 {{#if this.guestEmail}}
@@ -86,11 +86,11 @@
                 {{/if}}
                 
                 <div class="mt-auto">
-                  {{#if ../userRole === 'ADMIN' || (../userRole === 'CUSTOMER' && ../userId == this.userID)}}
+                  {{!-- {{#if eq (../userRole  'ADMIN') || (../userRole === 'CUSTOMER' && ../userId == this.userID)}}
                   <form action="/booking/{{this.id}}" method="POST" onsubmit="return confirm('Are you sure you want to delete this booking?');">
                     <button type="submit" class="btn btn-danger btn-sm w-100">Delete Booking</button>
                   </form>
-                  {{/if}}
+                  {{/if}} --}}
                 </div>
               </div>
             </div>

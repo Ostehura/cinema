@@ -30,20 +30,52 @@
 </head>
 <body>
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container-fluid">
+    <div class="container">
       <a class="navbar-brand" href="/">Cinema</a>
-    </div>
-    <div class="nav-item">
-      <a class="nav-link" href="/showtime">Showtimes</a>
-    </div>
-    <div class="nav-item">
-      <a class="nav-link" href="/admin">Admin</a>
-    </div>
-    <div class="nav-item">
-      <a class="nav-link" href="/cart">Cart</a>
-    </div>
-    <div class="nav-item">
-      <a class="nav-link" href="/booking/my">User</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link {{#if (eq activePage '/')}}active{{/if}}" href="/">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {{#if (eq activePage '/film')}}active{{/if}}" href="/film">Films</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {{#if (eq activePage '/filmformat')}}active{{/if}}" href="/filmformat">Formats</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {{#if (eq activePage '/booking')}}active{{/if}}" href="/booking">Bookings</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {{#if (eq activePage '/ticket')}}active{{/if}}" href="/ticket">Tickets</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {{#if (eq activePage  '/showtime')}}active{{/if}}" href="/showtime">Showtimes</a>
+          </li>
+          {{#if user}}
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+              {{user.firstName}} {{user.lastName}}
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="/booking/user/{{user.userId}}">My Tickets</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="/auth/logout">Logout</a></li>
+            </ul>
+          </li>
+          {{else}}
+          <li class="nav-item">
+            <a class="nav-link" href="/auth/login">Login</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/auth/register">Register</a>
+          </li>
+          {{/if}}
+        </ul>
+      </div>
     </div>
   </nav>
 
