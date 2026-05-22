@@ -3,6 +3,7 @@ import { NotFoundException } from '@nestjs/common';
 import { Between, ILike, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { getDateEnd, getDateStart } from 'src/showtime/helper';
+import { SeansFormat } from './seansFomat.enum';
 
 export class FilmService {
   constructor(
@@ -74,14 +75,19 @@ export class FilmService {
     });
   }
 
-  async findAllFilmsWithSeansByDay(date: Date): Promise<Film[]> {
+  async findAllFilmsWithSeansByDay(
+    date: Date,
+    filter?: { dubbing?: string; seansFormat?: SeansFormat },
+  ): Promise<Film[]> {
     const today = getDateStart(date);
     const weekEnd = getDateEnd(date);
-
     return this.filmRepository.find({
       relations: { filmFormat: { showtimes: true } },
       where: {
-        filmFormat: { showtimes: { starttime: Between(today, weekEnd) } },
+        filmFormat: {
+          showtimes: { starttime: Between(today, weekEnd) },
+          ...filter,
+        },
       },
       order: {
         filmFormat: { showtimes: { starttime: 'ASC' } },

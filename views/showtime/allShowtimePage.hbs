@@ -3,81 +3,129 @@
 
 {{#each days}}
 
-    <a
-        href="/showtime?date={{url}}"
-        class="btn btn-warning fw-bold px-4"
-    >
-        {{ title }}
-        {{!-- {{startime}} --}}
-    </a>
+        <a
+            href="/showtime?date={{url}}&language={{../selectedLanguage}}&format={{../selectedFormat}}"
+            class="btn btn-warning fw-bold px-4"
+        >
+            {{ title }}
+            {{!-- {{startime}} --}}
+        </a>
 
 {{/each}}
-</div>
+    </div>
+    <div class="d-flex flex-wrap gap-2 mb-2">
+        <label for="language">Choose language:</label>
 
-    {{#each films}}
-        <div class="row border-bottom py-4">
+        <select name="language" id="language" class="fw-bold px-4">
+            <option value="Select language" {{#if selectedLanguage}} selected {{/if}}>Select language</option>
+            {{#each languages }}
+            <option value="{{this}}" {{#if (eq this ../selectedLanguage)}} selected {{/if}}>{{this}}</option>
+            {{/each}}
+        </select>
+        <label for="format" >Choose format:</label>
 
-            <!-- Poster -->
-            <div class="col-md-2">
-                <img
-                    src="https://placehold.co/180x260?text={{title}}"
-                    class="img-fluid rounded shadow-sm"
-                    alt="{{title}}"
-                >
+        <select name="format" id="format" class="fw-bold px-4">
+             <option value="Select format" {{#if selectedFormat}} selected {{/if}}>Select format</option>
+            {{#each formats }}
+            <option value="{{this}}" {{#if (eq this ../selectedFormat)}} selected {{/if}}>{{this}}</option>
+            {{/each}}
+        </select>
+    </div>
+
+{{#each films}}
+    <div class="row border-bottom py-4">
+
+        <!-- Poster -->
+        <div class="col-md-2">
+            <img
+                src="https://placehold.co/180x260?text={{title}}"
+                class="img-fluid rounded shadow-sm"
+                alt="{{title}}"
+            >
+        </div>
+
+        <!-- Movie info -->
+        <div class="col-md-10">
+
+            <h3 class="fw-bold text-uppercase mb-2">
+                {{title}}
+            </h3>
+
+            <div class="text-muted mb-3">
+                Director: {{director}}
+                |
+                {{duration}} min
             </div>
 
-            <!-- Movie info -->
-            <div class="col-md-10">
+            <!-- FORMATS -->
+            {{#each filmFormat}}
 
-                <h3 class="fw-bold text-uppercase mb-2">
-                    {{title}}
-                </h3>
+                <div class="mb-4 p-3 bg-light rounded">
 
-                <div class="text-muted mb-3">
-                    Director: {{director}}
-                    |
-                    {{duration}} min
-                </div>
+                    <!-- Format title -->
+                    <h5 class="fw-bold text-uppercase mb-3">
+                        {{seansFormat}}
+                    </h5>
 
-                <!-- FORMATS -->
-                {{#each filmFormat}}
+                    <!-- Showtimes -->
+                    <div class="d-flex flex-wrap gap-2 mb-2">
 
-                    <div class="mb-4 p-3 bg-light rounded">
+                        {{#each showtimes}}
 
-                        <!-- Format title -->
-                        <h5 class="fw-bold text-uppercase mb-3">
-                            {{seansFormat}}
-                        </h5>
+                            <a
+                                href="/showtime/show/{{id}}"
+                                class="btn btn-warning fw-bold px-4"
+                            >
+                                {{formatHour starttime}}
+                                {{!-- {{startime}} --}}
+                            </a>
 
-                        <!-- Showtimes -->
-                        <div class="d-flex flex-wrap gap-2 mb-2">
-
-                            {{#each showtimes}}
-
-                                <a
-                                    href="/showtime/show/{{id}}"
-                                    class="btn btn-warning fw-bold px-4"
-                                >
-                                    {{formatHour starttime}}
-                                    {{!-- {{startime}} --}}
-                                </a>
-
-                            {{/each}}
-
-                        </div>
-
-                        <!-- Language -->
-                        <div class="text-secondary small">
-                            {{dubbing}}
-                        </div>
+                        {{/each}}
 
                     </div>
 
-                {{/each}}
+                    <!-- Language -->
+                    <div class="text-secondary small">
+                        {{dubbing}}
+                    </div>
 
-            </div>
+                </div>
+
+            {{/each}}
 
         </div>
-    {{/each}}
 
+    </div>
+{{/each}}
+{{!-- <input type="hidden" id="date" value={{}} --}}
 </div>
+
+<script>
+    const formatInput = document.getElementById('format');
+    const languageInput = document.getElementById('language');
+    const date = "{{selectedDay}}";
+    const language = "{{selectedLanguage}}";
+    const format = "{{selectedFormat}}";
+    formatInput.addEventListener('change', (e) => {
+    if (e.target.value === 'Select format') {   
+        window.location.replace('/showtime?date=' + date + '&language=' + language);
+    } else {
+        window.location.replace(
+            '/showtime?date=' + date +
+            '&language=' + language +
+            '&format=' + e.target.value
+        );
+    }
+    });
+    languageInput.addEventListener('change', (e) => {
+    if (e.target.value === 'Select language') {
+        window.location.replace('/showtime?date=' + date + '&format=' + format);
+    } else {
+        window.location.replace(
+            '/showtime?date=' + date +
+            '&language=' + e.target.value +
+            '&format=' + format
+        );
+    }
+    });
+</script>

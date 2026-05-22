@@ -60,4 +60,20 @@ export class FilmFormatService {
       throw new NotFoundException('Film format not found');
     }
   }
+
+  async getLanguages(language?: string) {
+    const query = this.filmFormatRepository
+      .createQueryBuilder('filmFormat')
+      .select('DISTINCT filmFormat.dubbing', 'dubbing');
+
+    if (language) {
+      query.where('filmFormat.dubbing ILIKE :language', {
+        language: `%${language}%`,
+      });
+    }
+
+    const result = await query.getRawMany<{ dubbing: string }>();
+
+    return result.map((item) => item.dubbing);
+  }
 }
