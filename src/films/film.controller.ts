@@ -29,6 +29,11 @@ export class FilmController {
     return await this.filmService.searchFilmsByName(query);
   }
 
+  @Get('suggestdubbing')
+  async suggestDubbing(@Query('q') query: string) {
+    return await this.filmFormatService.getLanguages(query);
+  }
+
   @Get()
   @UseGuards(OptionalJwtAuthGuard)
   @Render('films/index')
