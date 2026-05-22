@@ -96,7 +96,7 @@ export class ShowtimeService {
         const newShowtime = manager.create(Showtime, {
           audithoriumId: audithoriumId,
           filmFormatId: filmformat.id,
-          price: price,
+          price: price * 100,
           starttime: starttime,
           endtime: newEnd,
         });
