@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Cinema - New Booking</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { padding-top: 70px; }
+    .form-section { border: 1px solid #eee; border-radius: 8px; padding: 20px; margin-bottom: 25px; }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container">
+      <a class="navbar-brand" href="/">Cinema</a>
+      <div class="navbar-nav">
+        <a class="nav-link" href="/film">Films</a>
+        <a class="nav-link" href="/filmformat">Formats</a>
+        <a class="nav-link" href="/booking">Bookings</a>
+        <a class="nav-link" href="/ticket">Tickets</a>
+        <a class="nav-link" href="/showtime">Showtimes</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <div class="card mb-4">
+          <div class="card-header bg-success text-white">
+            <h3 class="mb-0">Create New Booking</h3>
+          </div>
+          <div class="card-body">
+            <form action="/booking/new" method="POST">
+              <div class="form-section">
+                <h5>Customer Information</h5>
+                <div class="row mb-3">
+                  <div class="col-md-6">
+                    <label class="form-label">User ID (optional for guests)</label>
+                    <input type="text" class="form-control" name="userID" placeholder="Enter user ID">
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Guest Email (if not registered user)</label>
+                    <input type="email" class="form-control" name="guestEmail" placeholder="Enter guest email">
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-section">
+                <h5>Showtime Selection</h5>
+                <div class="mb-3">
+                  <label class="form-label">Showtime ID</label>
+                  <input type="number" class="form-control" name="showtimeID" placeholder="Enter showtime ID" required>
+                  <div class="form-text">You can find showtime IDs from the /showtime endpoint</div>
+                </div>
+              </div>
+
+              <div class="form-section">
+                <h5>Ticket Information</h5>
+                <div class="row mb-3">
+                  <div class="col-md-3">
+                    <label class="form-label">Full Price Tickets</label>
+                    <input type="number" class="form-control" name="amount" min="0" max="4" value="0" required>
+                  </div>
+                  <div class="col-md-3">
+                    <label class="form-label">Reduced Price Tickets</label>
+                    <input type="number" class="form-control" name="amountReduced" min="0" max="4" value="0" required>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">3D Glasses Needed</label>
+                    <input type="number" class="form-control" name="glasses" min="0" max="4" value="0">
+                    <div class="form-text">Number of 3D glasses needed (for 3D showings)</div>
+                  </div>
+                </div>
+                <div class="alert alert-info mt-3">
+                  <strong>Note:</strong> Maximum 4 tickets total per booking (including reduced price tickets)
+                </div>
+              </div>
+
+              <div class="form-section">
+                <h5>Booking Time</h5>
+                <div class="mb-3">
+                  <label class="form-label">Booking Date and Time</label>
+                  <input type="datetime-local" class="form-control" name="datetime" required>
+                </div>
+              </div>
+
+              <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-success btn-lg">Create Booking</button>
+                <a href="/booking" class="btn btn-outline-secondary btn-lg">Cancel</a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
