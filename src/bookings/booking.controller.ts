@@ -8,6 +8,7 @@ import {
   Delete,
   Request,
   UnauthorizedException,
+  Render,
 } from '@nestjs/common';
 import { BookingService } from './booking.service';
 import { Booking } from './booking.entity';
@@ -39,6 +40,7 @@ export class BookingController {
   }
 
   @Get('my')
+  @Render('mybookings')
   @UseGuards(JwtAuthGuard)
   async getUserBookings(
     @Param('userId') userId: string,

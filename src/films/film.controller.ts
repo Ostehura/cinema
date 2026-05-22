@@ -11,13 +11,12 @@ import {
 } from '@nestjs/common';
 import { FilmService } from './film.service';
 import { FilmFormatService } from './filmFormat.service';
-import { SeansFormat } from './filmFormat.entity';
-
 import { UserRole } from '../users/user.entity';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { Roles } from 'src/auth/roles.decorator';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { OptionalJwtAuthGuard } from 'src/auth/optionalauth.guard';
+import { SeansFormat } from './seansFomat.enum';
 
 @Controller('film')
 export class FilmController {

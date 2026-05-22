@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 import { join } from 'node:path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as hbs from 'hbs';
+import { AllExceptionsFilter } from './http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -13,6 +14,7 @@ async function bootstrap() {
   app.setBaseViewsDir(join(__dirname, '..', 'views'));
   app.set('view options', { layout: 'layouts/main' });
   app.setViewEngine('hbs');
+  app.useGlobalFilters(new AllExceptionsFilter());
   process.on('uncaughtException', (err) => {
     console.error('UNCAUGHT EXCEPTION:', err);
   });

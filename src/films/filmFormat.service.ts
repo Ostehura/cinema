@@ -1,7 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FilmFormat, SeansFormat } from './filmFormat.entity';
+import { FilmFormat } from './filmFormat.entity';
+import { SeansFormat } from './seansFomat.enum';
 
 @Injectable()
 export class FilmFormatService {

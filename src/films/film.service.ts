@@ -88,4 +88,20 @@ export class FilmService {
       },
     });
   }
+
+  async findAllFilmsWithSeansByWeek(date: Date): Promise<Film[]> {
+    const today = getDateStart(date);
+    const weekEnd = new Date(date);
+    weekEnd.setDate(getDateEnd(date).getDate() + 7);
+
+    return this.filmRepository.find({
+      relations: { filmFormat: { showtimes: true } },
+      where: {
+        filmFormat: { showtimes: { starttime: Between(today, weekEnd) } },
+      },
+      order: {
+        filmFormat: { showtimes: { starttime: 'ASC' } },
+      },
+    });
+  }
 }

@@ -15,8 +15,8 @@ import { AudithoriumService } from './audithorium.service';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { AudithotoriumDto } from './audithorium.dto';
 import type { Response } from 'express';
-import { SeansFormat } from 'src/films/filmFormat.entity';
 import { AudithoriumFormatDTO } from './audithoriumFormatsDTO';
+import { SeansFormat } from 'src/films/seansFomat.enum';
 
 @Controller('audithorium')
 export class AudithoriumController {

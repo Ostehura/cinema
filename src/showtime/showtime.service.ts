@@ -7,12 +7,13 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { And, DataSource, In, LessThan, MoreThan, Repository } from 'typeorm';
 import { Showtime } from './showtime.entity';
-import { FilmFormat, SeansFormat } from 'src/films/filmFormat.entity';
+import { FilmFormat } from 'src/films/filmFormat.entity';
 import {
   Audithorium,
   AudithoriumFormat,
 } from 'src/audithorium/audithorium.entity';
 import { getDateEnd, getDateStart } from './helper';
+import { SeansFormat } from 'src/films/seansFomat.enum';
 
 const BUFFER_MINUTES = 10;
 

@@ -28,7 +28,7 @@ export class BookingService {
   async findByUserId(userID: string): Promise<Booking[]> {
     return this.bookingRepository.find({
       where: { userID },
-      relations: ['showtime', 'tickets'],
+      relations: { showtime: { filmFormat: { film: true } }, tickets: true },
       order: { datetime: 'ASC' },
     });
   }
@@ -140,14 +140,21 @@ export class BookingService {
             throw new InternalServerErrorException('Can not create reseration');
           }
           for (let j = 0; j < cartItem.length; j++) {
-            const ticket = manager.create(Ticket, {
-              bookingID: savedBooking.id,
-              showtimeID: savedBooking.showtimeID,
-              seatRow: cartItem[j].row,
-              seatNumber: cartItem[j].column,
-              ticketType: cartItem[j].ticketType,
-            });
-            await manager.insert(Ticket, ticket);
+            try {
+              const ticket = manager.create(Ticket, {
+                bookingID: savedBooking.id,
+                showtimeID: savedBooking.showtimeID,
+                seatRow: cartItem[j].row,
+                seatNumber: cartItem[j].column,
+                ticketType: cartItem[j].ticketType,
+              });
+              await manager.insert(Ticket, ticket);
+            } catch (e: any) {
+              console.log(e);
+              throw new BadRequestException(
+                `Place ${cartItem[j].column} row ${cartItem[j].row} is taken!`,
+              );
+            }
           }
           bookings.push(savedBooking);
         }
