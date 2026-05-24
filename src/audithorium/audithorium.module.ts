@@ -12,5 +12,6 @@ import { AuthModule } from 'src/auth/auth.module';
   ],
   controllers: [AudithoriumController],
   providers: [AudithoriumService],
+  exports: [AudithoriumService],
 })
 export class AudithoriumModule {}

@@ -1,10 +1,12 @@
 import { Audithorium } from 'src/audithorium/audithorium.entity';
+import { CartItem } from 'src/cart/cart.entity';
 import { FilmFormat } from 'src/films/filmFormat.entity';
 import {
   Column,
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -30,4 +32,7 @@ export class Showtime {
   @ManyToOne(() => FilmFormat, (filmFormat) => filmFormat.showtimes)
   @JoinColumn({ name: 'filmFormatId' })
   filmFormat?: FilmFormat;
+
+  @OneToMany(() => CartItem, (cartItem) => cartItem.showtime)
+  cartItems?: CartItem[];
 }

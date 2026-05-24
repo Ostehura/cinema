@@ -37,6 +37,19 @@ async function bootstrap() {
   hbs.handlebars.registerHelper('isMiddle', (seatIndex, total) => {
     return seatIndex === Math.floor(total / 2);
   });
+
+ 
+  hbs.handlebars.registerHelper('formatHour', function (date: string) {
+    const d = new Date(date);
+
+    return d.toLocaleTimeString('pl-PL', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  });
+  // hbs.handlebars.registerHelper('in', (lhs: any[], rhs) => {
+  //   return lhs.includes(rhs);
+  // });
   hbs.handlebars.registerHelper('eq', (a, b) => {
     return a === b;
   });

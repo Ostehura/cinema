@@ -12,6 +12,7 @@ import {
   Audithorium,
   AudithoriumFormat,
 } from 'src/audithorium/audithorium.entity';
+import { getDateEnd, getDateStart } from './helper';
 
 const BUFFER_MINUTES = 10;
 
@@ -27,6 +28,7 @@ export class ShowtimeService {
     audithoriumId: number,
     starttime: Date,
     price: number,
+    language: string,
   ) {
     if (starttime < new Date()) {
       throw new BadRequestException('Cannot schedule in the past');
@@ -34,11 +36,9 @@ export class ShowtimeService {
     if (price < 0) {
       throw new BadRequestException('Price should be positive!');
     }
-    const dayStart = new Date(starttime);
-    dayStart.setHours(0, 0, 0, 0);
+    const dayStart = getDateStart(starttime);
 
-    const dayEnd = new Date(starttime);
-    dayEnd.setHours(23, 59, 59, 999);
+    const dayEnd = getDateEnd(starttime);
     const showtime = await this.dataSource.transaction(
       'SERIALIZABLE',
       async (manager) => {
@@ -50,9 +50,12 @@ export class ShowtimeService {
           order: { starttime: 'ASC' },
           relations: ['filmFormat', 'filmFormat.film'],
         });
-
         const filmformat = await manager.findOne(FilmFormat, {
-          where: { filmID: filmId, seansFormat: seansFormat },
+          where: {
+            filmID: filmId,
+            seansFormat: seansFormat,
+            dubbing: language,
+          },
           relations: { film: true },
         });
         if (!filmformat || !filmformat.film) {
@@ -112,7 +115,7 @@ export class ShowtimeService {
       where: { audithoriumId: audithoriumId },
     });
   }
-  async deleteShowtime(id: number): Promise<boolean> {
+  async deleteShowtime(id: number): Promise<Showtime> {
     const showtime = await this.showtimeRepository.findOne({ where: { id } });
     if (!showtime) {
       throw new NotFoundException('Showtime does not exist');
@@ -121,7 +124,7 @@ export class ShowtimeService {
     if (!res) {
       throw new InternalServerErrorException('Something went wrong');
     }
-    return true;
+    return showtime;
   }
 
   async deleteShowtimeForAudithorium(
@@ -166,11 +169,9 @@ export class ShowtimeService {
   }
 
   async getShowsByAudithorium(date: Date, audithoriumId: number) {
-    const dayStart = new Date(date);
-    dayStart.setHours(0, 0, 0, 0);
+    const dayStart = getDateStart(date);
 
-    const dayEnd = new Date(date);
-    dayEnd.setHours(23, 59, 59, 999);
+    const dayEnd = getDateEnd(date);
 
     return this.showtimeRepository.find({
       where: {
@@ -179,5 +180,36 @@ export class ShowtimeService {
       },
       relations: { filmFormat: { film: true } },
     });
+  }
+
+  async getShowtimePerAudithoriumAndDay(
+    audithoriumId: number,
+    date: Date,
+  ): Promise<Showtime[]> {
+    const dayStart = getDateStart(date);
+
+    const dayEnd = getDateEnd(date);
+
+    return await this.showtimeRepository.find({
+      where: {
+        audithoriumId: audithoriumId,
+        starttime: And(MoreThan(dayStart), LessThan(dayEnd)),
+      },
+      relations: { filmFormat: { film: true } },
+    });
+  }
+
+  async getShowtimeId(id: number): Promise<Showtime> {
+    const show = await this.showtimeRepository.findOne({
+      where: { id },
+      relations: {
+        audithorium: true,
+        filmFormat: { film: true },
+      },
+    });
+    if (!show) {
+      throw new NotFoundException(`No show time found`);
+    }
+    return show;
   }
 }

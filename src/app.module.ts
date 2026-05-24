@@ -22,7 +22,9 @@ import { FilmsModule } from './films/film.module';
 import { ShowtimeModule } from './showtime/showtime.module';
 import { Showtime } from './showtime/showtime.entity';
 import { BookingModule } from './bookings/booking.module';
-import { DatabaseSeeder } from './seeds/database.seed';
+import { CartModule } from './cart/cart.module';
+import { Cart, CartItem } from './cart/cart.entity';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -40,6 +42,8 @@ import { DatabaseSeeder } from './seeds/database.seed';
         Audithorium,
         AudithoriumFormat,
         Showtime,
+        Cart,
+        CartItem,
         Booking,
         Ticket,
       ],
@@ -51,12 +55,13 @@ import { DatabaseSeeder } from './seeds/database.seed';
     AudithoriumModule,
     FilmsModule,
     ShowtimeModule,
+    CartModule,
+    AdminModule,
     BookingModule,
   ],
   controllers: [AppController],
   providers: [
     AppService,
-    DatabaseSeeder,
     {
       provide: APP_INTERCEPTOR,
       useClass: LayoutInterceptor,

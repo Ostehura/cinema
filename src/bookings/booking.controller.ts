@@ -10,6 +10,7 @@ import {
   Redirect,
   Request,
   Delete,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { BookingService } from './booking.service';
 import { Booking } from './booking.entity';
@@ -71,6 +72,25 @@ export class BookingController {
      const bookings = await this.bookingService.findByUserId(req.user.userId);
      return { bookings, userId: req.user.userId };
    }
+
+  @Get('my')
+  @UseGuards(JwtAuthGuard)
+  async getUserBookings(
+    @Param('userId') userId: string,
+    @Request() req: RequestWithUser,
+  ): Promise<{ future: Booking[]; past: Booking[] }> {
+    if (!req.user) {
+      throw new UnauthorizedException();
+    }
+    const bookings = await this.bookingService.findByUserId(req.user.userId);
+    const curent = bookings.filter((booking) => {
+      return booking.showtime.starttime >= new Date();
+    });
+    const past = bookings.filter((booking) => {
+      return booking.showtime.starttime < new Date();
+    });
+    return { future: curent, past: past };
+  }
 
   @Get(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)

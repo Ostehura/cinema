@@ -1,0 +1,11 @@
+<a class="btn btn-primary" href="/audithorium">Manage audithoriums</a>
+<a class="btn btn-primary" href="/film">Manage films library</a>
+<a class="btn btn-primary" href="/showtime/new">Add showtime</a>
+<a class="btn btn-primary" href="/booking">See bookings</a>
+<br/>
+View audithoriums:
+{{#each audithoriums}}
+<br/>
+<a href="/showtime/audithorium/{{this.id}}?date={{../date}}" class="btn btn-primary" style="margin: 5px;">{{this.name}}</a>
+{{/each}}
+

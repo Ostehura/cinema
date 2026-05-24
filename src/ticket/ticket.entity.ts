@@ -1,23 +1,10 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToOne,
-  JoinColumn,
-} from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn, PrimaryColumn } from 'typeorm';
 import { Booking } from '../bookings/booking.entity';
 import { Showtime } from '../showtime/showtime.entity';
-
-export enum TicketType {
-  REDUCED = 'Reduced',
-  FULL = 'Full',
-}
+import { TicketType } from 'src/cart/cart.entity';
 
 @Entity()
 export class Ticket {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
-
   @Column()
   bookingID?: string;
 
@@ -25,18 +12,18 @@ export class Ticket {
   @JoinColumn({ name: 'bookingID' })
   booking?: Booking;
 
-  @Column()
-  showtimeID: number;
+  @PrimaryColumn()
+  showtimeID?: number;
 
   @ManyToOne(() => Showtime)
   @JoinColumn({ name: 'showtimeID' })
   showtime?: Showtime;
 
-  @Column({ type: 'int' })
-  seatRow: number;
+  @PrimaryColumn({ type: 'int' })
+  seatRow!: number;
 
-  @Column({ type: 'int' })
-  seatNumber: number;
+  @PrimaryColumn({ type: 'int' })
+  seatNumber!: number;
 
   @Column({ type: 'enum', enum: TicketType })
   ticketType?: TicketType;

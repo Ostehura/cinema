@@ -1,6 +1,7 @@
 import { Type } from 'class-transformer';
 import { IsDate, IsEnum, IsInt, IsString } from 'class-validator';
-import { SeansFormat } from 'src/films/filmFormat.entity';
+import { Audithorium } from 'src/audithorium/audithorium.entity';
+import { FilmFormat, SeansFormat } from 'src/films/filmFormat.entity';
 
 export class CreateShowTimeDTO {
   @IsString()
@@ -16,4 +17,32 @@ export class CreateShowTimeDTO {
   starttime!: Date;
   @IsEnum(SeansFormat)
   format!: SeansFormat;
+  @IsString()
+  language!: string;
+}
+
+export class DeleteSHowtimeForAuditoriumDTO {
+  @IsInt()
+  @Type(() => Number)
+  audithoriumId!: number;
+  @IsDate()
+  @Type(() => Date)
+  day!: Date;
+}
+
+export class SeatOutDto {
+  column!: number;
+  row!: number;
+}
+export class ShowTimeDTO {
+  id!: number;
+  filmFormatId!: string;
+  audithoriumId!: number;
+  price!: number;
+  starttime!: Date;
+  endtime!: Date;
+  audithorium!: Audithorium;
+  filmFormat!: FilmFormat;
+  yourSeats!: string;
+  takenSeats!: string;
 }

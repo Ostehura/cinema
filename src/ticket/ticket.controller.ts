@@ -8,11 +8,12 @@ import {
   Delete,
 } from '@nestjs/common';
 import { TicketService } from './ticket.service';
-import { Ticket, TicketType } from './ticket.entity';
+import { Ticket } from './ticket.entity';
 import { JwtAuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { UserRole } from '../users/user.entity';
+import { TicketType } from 'src/cart/cart.entity';
 
 @Controller('ticket')
 export class TicketController {
@@ -34,12 +35,12 @@ export class TicketController {
     return this.ticketService.findByBookingId(bookingId);
   }
 
-  @Get(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
-  async getTicketById(@Param('id') id: string): Promise<Ticket> {
-    return this.ticketService.findById(id);
-  }
+  // @Get(':id')
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  // @Roles(UserRole.ADMIN)
+  // async getTicketById(@Param('id') id: string): Promise<Ticket> {
+  //   return this.ticketService.findById(id);
+  // }
 
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
