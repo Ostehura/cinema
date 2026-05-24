@@ -8,8 +8,8 @@ import {
 import { DataSource, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Booking } from './booking.entity';
-import { Cart, CartItem, TicketType } from 'src/cart/cart.entity';
-import { Ticket } from 'src/ticket/ticket.entity';
+import { Cart, CartItem } from 'src/cart/cart.entity';
+import { Ticket,  TicketType  } from 'src/ticket/ticket.entity';
 import { validate as isUUID } from 'uuid';
 
 @Injectable()

@@ -1,105 +1,108 @@
-<div class="container text-center">
-  <div class="row align-items-start">
-    <div class="col">
-      <a href="/showtime/audithorium/{{{audithoriumId}}}?date={{{yesterday}}}">Previous Day</a>
+<div class="container mt-5">
+    <div class="container text-center">
+    <div class="row align-items-start">
+        <div class="col">
+        <a href="/showtime/audithorium/{{{audithoriumId}}}?date={{{yesterday}}}">Previous Day</a>
+        </div>
+        <div class="col">
+        {{date}}
+        </div>
+        <div class="col">
+        <a href="/showtime/audithorium/{{{audithoriumId}}}?date={{{tommorow}}}">Next Day</a>
+        </div>
     </div>
-    <div class="col">
-      {{date}}
     </div>
-    <div class="col">
-      <a href="/showtime/audithorium/{{{audithoriumId}}}?date={{{tommorow}}}">Next Day</a>
+    <div class="mb-3">
+        <label class="form-label">Select Time</label>
+
+        <div id="timeline" class="border position-relative" style="height: 960px; overflow-y: auto;">
+            <!-- hours -->
+            <div id="hours"></div>
+
+            <!-- existing shows -->
+            <div id="shows"></div>
+
+            <!-- selected marker -->
+            <div id="selection" class="position-absolute bg-primary" style="height: 4px; width: 100%; display:none;"></div>
+        </div>
     </div>
-  </div>
-</div>
-<div class="mb-3">
-    <label class="form-label">Select Time</label>
 
-    <div id="timeline" class="border position-relative" style="height: 960px; overflow-y: auto;">
-        <!-- hours -->
-        <div id="hours"></div>
+    <form action="/showtime/audithorium/delete" method="post">
+        <input type="hidden" name="day" value="{{date}}"/>
+        <input type="hidden" name="audithoriumId" value="{{audithoriumId}}"/>
+    <button type="submit">Cancel shows</button>
+    </form>
 
-        <!-- existing shows -->
-        <div id="shows"></div>
+    <script>
+        const shows = {{{list}}};
+        const START_HOUR = 8;
+        const END_HOUR = 24;
+        const HOUR_HEIGHT = 60;
+        const timeline = document.getElementById('timeline');
+        const hoursContainer = document.getElementById('hours');
+        const showsContainer = document.getElementById('shows');
+        function renderHours() {
+        for (let h = START_HOUR; h < END_HOUR; h++) {
+            const div = document.createElement('div');
+            div.style.height = HOUR_HEIGHT + 'px';
+            div.className = 'border-top small ps-2';
 
-        <!-- selected marker -->
-        <div id="selection" class="position-absolute bg-primary" style="height: 4px; width: 100%; display:none;"></div>
-    </div>
-</div>
-
-<form action="/showtime/audithorium/delete" method="post">
-    <input type="hidden" name="day" value="{{date}}"/>
-    <input type="hidden" name="audithoriumId" value="{{audithoriumId}}"/>
- <button type="submit">Cancel shows</button>
-</form>
-
-<script>
-    const shows = {{{list}}};
-    const START_HOUR = 8;
-    const END_HOUR = 24;
-    const HOUR_HEIGHT = 60;
-    const timeline = document.getElementById('timeline');
-    const hoursContainer = document.getElementById('hours');
-    const showsContainer = document.getElementById('shows');
-    function renderHours() {
-    for (let h = START_HOUR; h < END_HOUR; h++) {
-        const div = document.createElement('div');
-        div.style.height = HOUR_HEIGHT + 'px';
-        div.className = 'border-top small ps-2';
-
-        div.innerHTML = `${h.toString().padStart(2,'0')}:00`;
-        hoursContainer.appendChild(div);
+            div.innerHTML = `${h.toString().padStart(2,'0')}:00`;
+            hoursContainer.appendChild(div);
+        }
     }
-}
-function DateToTimeString(date)
-{
-    const hh = String(date.getHours()).padStart(2, '0');
-    const mm = String(date.getMinutes()).padStart(2, '0');
+    function DateToTimeString(date)
+    {
+        const hh = String(date.getHours()).padStart(2, '0');
+        const mm = String(date.getMinutes()).padStart(2, '0');
 
-    const time = `${hh}:${mm}`;
-    return time;
-}
-// 🎬 Render existing shows
-function renderShows(shows) {
-    showsContainer.innerHTML = '';
-    shows.forEach(show => {
-        const start = timeToMinutes(DateToTimeString(new Date(show.starttime)));
-        const end = timeToMinutes(DateToTimeString(new Date(show.endtime)));
-        const top = ((start - START_HOUR * 60) / 60) * HOUR_HEIGHT;
-        const height = ((end - start) / 60) * HOUR_HEIGHT;
+        const time = `${hh}:${mm}`;
+        return time;
+    }
+    // 🎬 Render existing shows
+    function renderShows(shows) {
+        showsContainer.innerHTML = '';
+        shows.forEach(show => {
+            const start = timeToMinutes(DateToTimeString(new Date(show.starttime)));
+            const end = timeToMinutes(DateToTimeString(new Date(show.endtime)));
+            const top = ((start - START_HOUR * 60) / 60) * HOUR_HEIGHT;
+            const height = ((end - start) / 60) * HOUR_HEIGHT;
 
-        const div = document.createElement('div');
-        div.className = 'position-absolute bg-danger text-white px-1';
-        div.style.top = top + 'px';
-        div.style.height = height + 'px';
-        div.style.left = '80px';
-        div.style.right = '10px';
+            const div = document.createElement('div');
+            div.className = 'position-absolute bg-danger text-white px-1';
+            div.style.top = top + 'px';
+            div.style.height = height + 'px';
+            div.style.left = '80px';
+            div.style.right = '10px';
 
-        div.innerText = show.filmFormat.film.title + "|" +show.filmFormat.dubbing+"|"+show.filmFormat.seansFormat;
-        showsContainer.appendChild(div);
-        const linkToShow = document.createElement('a');
-        linkToShow.href = `/showtime/show/${show.id}`;
-        linkToShow.innerText = 'View show';
-        linkToShow.className='btn btn-primary';
-        const deleteToShow = document.createElement('a');
-        deleteToShow.href = `/showtime/show/${show.id}/delete`;
-        deleteToShow.innerText = 'Delete show';
-        deleteToShow.classList='btn btn-warning';
-        div.appendChild(linkToShow);
-        div.appendChild(deleteToShow);
-    });
-}
+            div.innerText = show.filmFormat.film.title + "|" +show.filmFormat.dubbing+"|"+show.filmFormat.seansFormat;
+            showsContainer.appendChild(div);
+            const linkToShow = document.createElement('a');
+            linkToShow.href = `/showtime/show/${show.id}`;
+            linkToShow.innerText = 'View show';
+            linkToShow.className='btn btn-primary';
+            const deleteToShow = document.createElement('a');
+            deleteToShow.href = `/showtime/show/${show.id}/delete`;
+            deleteToShow.innerText = 'Delete show';
+            deleteToShow.classList='btn btn-warning';
+            div.appendChild(linkToShow);
+            div.appendChild(deleteToShow);
+        });
+    }
 
-// 🧮 Helpers
-function timeToMinutes(t) {
-    const [h, m] = t.split(':').map(Number);
-    return h * 60 + m;
-}
+    // 🧮 Helpers
+    function timeToMinutes(t) {
+        const [h, m] = t.split(':').map(Number);
+        return h * 60 + m;
+    }
 
-function minutesToTime(min) {
-    const h = Math.floor(min / 60);
-    const m = min % 60;
-    return `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`;
-}
-renderHours();
-renderShows(shows);
-</script>
+    function minutesToTime(min) {
+        const h = Math.floor(min / 60);
+        const m = min % 60;
+        return `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`;
+    }
+    renderHours();
+    renderShows(shows);
+    </script>
+
+</div>

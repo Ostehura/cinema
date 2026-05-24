@@ -18,10 +18,11 @@ import {
   CartUpdateDto,
   CartViewDto,
 } from './cart.dto';
-import { CartItem, TicketType } from './cart.entity';
+import { CartItem } from './cart.entity';
 import { CartService } from './cart.service';
 import { Money } from 'src/helper/money';
 import { BookingService } from 'src/bookings/booking.service';
+import {TicketType } from 'src/ticket/ticket.entity';
 
 function TicketFare(ticketType: TicketType) {
   return ticketType == TicketType.FULL ? 1 : 0.8;
@@ -172,7 +173,7 @@ export class CartController {
   }
 
   @Post('place')
-  @Redirect('/booking/my')
+  @Redirect('/booking/my-booking')
   @UseGuards(OptionalJwtAuthGuard)
   async PlaceOrder(
     @Req() req: RequestWithUser,

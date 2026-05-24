@@ -15,7 +15,8 @@
             </div>
             <div class="nav-links">
                 <a href="/" class="nav-link {{#if (eq activePage '/')}}active{{/if}}">Home</a>
-                <a href="/film" class="nav-link {{#if (eq activePage '/film')}}active{{/if}}">Films</a>
+                <a href="/film/user" class="nav-link {{#if (eq activePage '/film/user')}}active{{/if}}">Films</a>
+                <a href="/showtime/allShowtimePage"  class="nav-link {{#if (eq activePage '/showtime/seeShowtimePage')}}active{{/if}}">Showtimes</a>
                 {{#if user}}
                 <a href="/booking/my-bookings" class="nav-link {{#if (eq activePage '/booking/view')}}active{{/if}}">My Bookings</a>
                 {{else}}
@@ -46,7 +47,7 @@
                         <li><a href="/film">Now Showing</a></li>
                         <li><a href="/auth/login">Login</a></li>
                         <li><a href="/auth/register">Register</a></li>
-                        <li><a href="/cart">Concessions</a></li>
+                        <li><a href="/cart">Cart</a></li>
                     </ul>
                 </div>
 

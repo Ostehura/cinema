@@ -1,7 +1,12 @@
 import { Entity, Column, ManyToOne, JoinColumn, PrimaryColumn } from 'typeorm';
 import { Booking } from '../bookings/booking.entity';
 import { Showtime } from '../showtime/showtime.entity';
-import { TicketType } from 'src/cart/cart.entity';
+
+
+export enum TicketType {
+  FULL = 'full',
+  REDUCED = 'reduced',
+}
 
 @Entity()
 export class Ticket {

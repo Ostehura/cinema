@@ -5,10 +5,10 @@ import { FilmFormatService } from './filmFormat.service';
 import { FilmController, FilmFormatController } from './film.controller';
 import { Film } from './film.entity';
 import { FilmFormat } from './filmFormat.entity';
-import { BookingsModule } from '../bookings/bookings.module';
+import { BookingModule } from '../bookings/booking.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Film, FilmFormat]), BookingsModule],
+  imports: [TypeOrmModule.forFeature([Film, FilmFormat]), BookingModule],
   controllers: [FilmController, FilmFormatController],
   providers: [FilmService, FilmFormatService],
   exports: [FilmService, FilmFormatService],
