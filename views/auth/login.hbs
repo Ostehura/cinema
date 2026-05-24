@@ -1,0 +1,30 @@
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="form-container">
+                <h2 class="text-center mb-4">Welcome Back</h2>
+                <p class="text-center text-muted mb-5">Sign in to your Cinema City account</p>
+                <form action="/auth/login" method="POST">
+                    <div class="mb-4">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 py-3">Sign In</button>
+                    {{#if error}}
+                    <div class="alert alert-danger mt-4">
+                        {{error}}
+                    </div>
+                    {{/if}}
+                </form>
+                <div class="text-center mt-4">
+                    <p>Don't have an account? <a href="/auth/register" class="text-primary">Create one</a></p>
+                    <p class="small text-muted mt-3">By signing in, you agree to our Terms of Service and Privacy Policy.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

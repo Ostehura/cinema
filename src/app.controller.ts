@@ -10,6 +10,6 @@ export class AppController {
   @Render('index')
   @UseGuards(OptionalJwtAuthGuard)
   getHello(): any {
-    return {};
+    return { activePage: '/' };
   }
 }

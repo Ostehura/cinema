@@ -2,8 +2,7 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Booking } from './booking.entity';
-import { Showtime } from '../showtime/showtime.entity';
-import { User } from '../users/user.entity';
+import { validate as isUUID } from 'uuid';
 
 @Injectable()
 export class BookingService {
@@ -13,14 +12,8 @@ export class BookingService {
   ) {}
 
   async findAll(): Promise<Booking[]> {
-    return this.bookingRepository.find({ relations: ['user', 'showtime'] });
-  }
-
-  async findByUserId(userID: string): Promise<Booking[]> {
     return this.bookingRepository.find({
-      where: { userID },
-      relations: ['showtime'],
-      order: { datetime: 'ASC' },
+      relations: ['user', 'showtime'],
     });
   }
 
@@ -29,33 +22,45 @@ export class BookingService {
       where: { id },
       relations: ['user', 'showtime'],
     });
+
     if (!booking) {
       throw new NotFoundException('Booking not found');
     }
+
     return booking;
   }
 
-  async searchBookings(options: { userID?: string; guestEmail?: string; date?: Date }): Promise<Booking[]> {
-    const query = this.bookingRepository.createQueryBuilder('booking')
+  async findByUserId(userID: string): Promise<Booking[]> {
+    return this.bookingRepository.find({
+      where: {
+        userID,
+      },
+      relations: ['user', 'showtime'],
+    });
+  }
+
+  async searchBookings(search: string): Promise<Booking[]> {
+    const query = this.bookingRepository
+      .createQueryBuilder('booking')
       .leftJoinAndSelect('booking.user', 'user')
       .leftJoinAndSelect('booking.showtime', 'showtime');
 
-    if (options.userID) {
-      query.andWhere('booking.userID = :userID', { userID: options.userID });
-    }
-    if (options.guestEmail) {
-      query.andWhere('booking.guestEmail = :guestEmail', { guestEmail: options.guestEmail });
-    }
-    if (options.date) {
-      const startOfDay = new Date(options.date);
-      startOfDay.setHours(0, 0, 0, 0);
-      const endOfDay = new Date(options.date);
-      endOfDay.setHours(23, 59, 59, 999);
-      query.andWhere('showtime.starttime BETWEEN :start AND :end', { start: startOfDay, end: endOfDay });
+    if (isUUID(search)) {
+      query.where('booking.id = :search', { search });
+    } else {
+      query.where(
+        `
+        user.email ILIKE :search
+        OR booking.guestEmail ILIKE :search
+        `,
+        {
+          search: `%${search}%`,
+        },
+      );
     }
 
-    return query.getMany();
-  }
+  return query.getMany();
+}
 
   async create(
     showtimeID: number,
@@ -71,8 +76,11 @@ export class BookingService {
     }
 
     const totalTickets = amount + amountReduced;
+
     if (totalTickets < 1 || totalTickets > 4) {
-      throw new BadRequestException('Total tickets must be between 1 and 4');
+      throw new BadRequestException(
+        'Total tickets must be between 1 and 4',
+      );
     }
 
     const booking = this.bookingRepository.create({
@@ -84,11 +92,13 @@ export class BookingService {
       datetime,
       glasses,
     });
+
     return this.bookingRepository.save(booking);
   }
 
   async delete(id: string): Promise<void> {
     const result = await this.bookingRepository.delete(id);
+
     if (result.affected === 0) {
       throw new NotFoundException('Booking not found');
     }

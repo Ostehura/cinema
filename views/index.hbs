@@ -1,3 +1,47 @@
-<div>
-    
-</div>
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-content">
+        <h1>Experience the Magic of Cinema</h1>
+        <p>Now showing the latest blockbusters and timeless classics</p>
+        <div class="hero-buttons">
+            <a href="/film" class="btn-primary">See What's Playing</a>
+            <a href="/auth/login" class="btn-secondary">Login to Book</a>
+        </div>
+    </div>
+</section>
+
+<!-- Films Section -->
+<section class="main-content">
+    <div class="container">
+        <div class="section-title">
+            <h2>Now Playing</h2>
+        </div>
+        <div class="films-grid">
+            {{#if films.length}}
+                {{#each films}}
+                    <div class="film-card">
+                        <div class="film-poster" style="background-image: url('https://via.placeholder.com/400x600/000000/FFFFFF?text={{title}}')">
+                            <button class="play-button">▶</button>
+                        </div>
+                        <div class="film-info">
+                            <h3>{{title}}</h3>
+                            <div class="meta">
+                                <span>{{duration}} min</span>
+                                <span>{{director}}</span>
+                            </div>
+                            <p>{{description}}</p>
+                            <div class="film-actions">
+                                <a href="/film/view/{{id}}" class="btn btn-primary">View Details</a>
+                                <a href="/film/view/{{id}}" class="btn btn-outline">Showtimes</a>
+                            </div>
+                        </div>
+                    </div>
+                {{/each}}
+            {{else}}
+                <div class="col-12">
+                    <p class="text-center">No films available at the moment.</p>
+                </div>
+            {{/if}}
+        </div>
+    </div>
+</section>

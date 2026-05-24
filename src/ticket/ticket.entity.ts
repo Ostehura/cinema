@@ -4,7 +4,6 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
-  PrimaryColumn,
 } from 'typeorm';
 import { Booking } from '../bookings/booking.entity';
 import { Showtime } from '../showtime/showtime.entity';
@@ -16,8 +15,8 @@ export enum TicketType {
 
 @Entity()
 export class Ticket {
-  @Column('uuid')
-  id?: string;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column()
   bookingID?: string;
@@ -26,18 +25,18 @@ export class Ticket {
   @JoinColumn({ name: 'bookingID' })
   booking?: Booking;
 
-  @PrimaryColumn()
-  showtimeID?: number;
+  @Column()
+  showtimeID: number;
 
   @ManyToOne(() => Showtime)
   @JoinColumn({ name: 'showtimeID' })
   showtime?: Showtime;
 
-  @PrimaryColumn({ type: 'int' })
-  seatRow?: number;
+  @Column({ type: 'int' })
+  seatRow: number;
 
-  @PrimaryColumn({ type: 'int' })
-  seatNumber?: number;
+  @Column({ type: 'int' })
+  seatNumber: number;
 
   @Column({ type: 'enum', enum: TicketType })
   ticketType?: TicketType;

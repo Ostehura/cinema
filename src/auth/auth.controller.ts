@@ -7,28 +7,28 @@ import {
   Render,
   Request,
   Res,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import type { Response } from 'express';
 import { JwtAuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 import { OptionalJwtAuthGuard } from './optionalauth.guard';
-import { UserPayload } from 'src/helper/requestWIthUser';
-import type { RequestWithUser } from 'src/helper/requestWIthUser';
+import type { RequestWithUser, UserPayload } from 'src/helper/requestWIthUser';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @Get('login')
-  @Render('login')
-  async logInPage() {}
-  @Get('signup')
-  @Render('register')
-  async signUpPage() {}
+   @Get('login')
+   @Render('auth/login')
+   async logInPage() {}
+   @Get('register')
+   @Render('auth/register')
+   async signUpPage() {}
 
   @UseGuards(OptionalJwtAuthGuard)
-  @Redirect('/')
+  @Redirect('/cart/merge')
   @Post('login')
   async login(
     @Body('email') email: string,
@@ -56,7 +56,10 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
-  getProfile(@Request() req: RequestWithUser): UserPayload | undefined {
+  getProfile(@Request() req: RequestWithUser): UserPayload {
+    if (!req.user) {
+      throw new UnauthorizedException('User have no access to page!');
+    }
     return req.user;
   }
 

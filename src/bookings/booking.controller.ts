@@ -26,18 +26,14 @@ interface RequestWithUser {
 export class BookingController {
   constructor(private readonly bookingService: BookingService) {}
 
-  @Get()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
-  @Render('bookings/index')
-  async listBookings(@Query() query: any) {
-    const bookings = await this.bookingService.searchBookings({
-      userID: query.userID,
-      guestEmail: query.guestEmail,
-      date: query.date ? new Date(query.date) : undefined,
-    });
-    return { bookings };
-  }
+   @Get()
+   @UseGuards(JwtAuthGuard, RolesGuard)
+   @Roles(UserRole.ADMIN)
+   @Render('bookings/index')
+   async listBookings(@Query() query: any) {
+     const bookings = await this.bookingService.searchBookings(query.search);
+     return { bookings, activePage: '/booking' };
+   }
 
   @Get('search')
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -47,14 +43,34 @@ export class BookingController {
     return {};
   }
 
-  @Get('user/:userId')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
-  @Render('bookings/user')
-  async userBookings(@Param('userId') userId: string) {
-    const bookings = await this.bookingService.findByUserId(userId);
-    return { bookings, userId };
-  }
+
+
+   @Get('view')
+   @Render('bookings/view')
+   async view(){
+    const bookings = await this.bookingService.findAll();
+    return bookings
+   }
+
+   @Get('user/:userId')
+   @UseGuards(JwtAuthGuard, RolesGuard)
+   @Roles(UserRole.ADMIN)
+   @Render('bookings/user')
+   async userBookings(@Param('userId') userId: string) {
+     const bookings = await this.bookingService.findByUserId(userId);
+     return { bookings, userId };
+   }
+
+   @Get('my-bookings')
+   @UseGuards(JwtAuthGuard)
+   @Render('bookings/user')
+   async myBookings(@Request() req: RequestWithUser) {
+     if (!req.user) {
+       throw new Error('User not found');
+     }
+     const bookings = await this.bookingService.findByUserId(req.user.userId);
+     return { bookings, userId: req.user.userId };
+   }
 
   @Get(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)

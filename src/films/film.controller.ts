@@ -30,13 +30,13 @@ export class FilmController {
     return await this.filmService.searchFilmsByName(query);
   }
 
-  @Get()
-  @UseGuards(OptionalJwtAuthGuard)
-  @Render('films/index')
-  async listFilms() {
-    const films = await this.filmService.findAll();
-    return { films };
-  }
+   @Get()
+   @UseGuards(OptionalJwtAuthGuard)
+   @Render('films/index')
+   async listFilms() {
+     const films = await this.filmService.findAll();
+     return { films, activePage: '/film' };
+   }
 
   @Get('view/:id')
   @UseGuards(OptionalJwtAuthGuard)
