@@ -62,7 +62,10 @@ export class ShowtimeController {
     @Query('audithorium') auditoriumId: number,
     @Query('date') date: Date,
   ) {
-    return await this.showtimeService.getShowsByAudithorium(date, auditoriumId);
+    return await this.showtimeService.getShowtimePerAudithoriumAndDay(
+      auditoriumId,
+      date,
+    );
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -243,6 +246,34 @@ export class ShowtimeController {
       selectedFormat: format,
       formats: Object.values(SeansFormat),
       films: films,
+    };
+  }
+
+  @UseGuards(OptionalJwtAuthGuard)
+  @Render('showtime/filmformatShows')
+  @Get('ff/:id')
+  async getShowTimeByFilmFormat(
+    @Param('id') filmFormatId: string,
+    @Query('date') rowDate?: string,
+  ) {
+    let date: Date;
+    if (rowDate) {
+      date = new Date(rowDate);
+    } else {
+      date = new Date();
+    }
+    return {
+      filmFormatId: filmFormatId,
+      selectedDay: rowDate,
+      days: await this.showtimeService.GetFilmAvailability(
+        { id: filmFormatId },
+        new Date(),
+        7,
+      ),
+      films: await this.showtimeService.getShowsPerFormatAndDate(
+        filmFormatId,
+        date,
+      ),
     };
   }
 }

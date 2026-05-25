@@ -1,35 +1,19 @@
 <div class="container mt-4">
+    <a  class="btn btn-info fw-bold px-4" href="/showtime" style="margin: 10px;"> To all films</a>
+
    <div class="d-flex flex-wrap gap-2 mb-2">
 
 {{#each days}}
 
         <a
-            href="/showtime?date={{url}}&language={{../selectedLanguage}}&format={{../selectedFormat}}"
-            class="btn btn-warning fw-bold px-4"
+            href="/showtime/ff/{{../filmFormatId}}?date={{url}}"
+           class="btn btn-warning fw-bold px-4  {{#if disabled}} disabled {{/if}}"
         >
-            {{ title }}
+            {{ date }}
             {{!-- {{startime}} --}}
         </a>
 
 {{/each}}
-    </div>
-    <div class="d-flex flex-wrap gap-2 mb-2">
-        <label for="language">Choose language:</label>
-
-        <select name="language" id="language" class="fw-bold px-4">
-            <option value="Select language" {{#if selectedLanguage}} selected {{/if}}>Select language</option>
-            {{#each languages }}
-            <option value="{{this}}" {{#if (eq this ../selectedLanguage)}} selected {{/if}}>{{this}}</option>
-            {{/each}}
-        </select>
-        <label for="format" >Choose format:</label>
-
-        <select name="format" id="format" class="fw-bold px-4">
-             <option value="Select format" {{#if selectedFormat}} selected {{/if}}>Select format</option>
-            {{#each formats }}
-            <option value="{{this}}" {{#if (eq this ../selectedFormat)}} selected {{/if}}>{{this}}</option>
-            {{/each}}
-        </select>
     </div>
 
 {{#each films}}
@@ -38,9 +22,9 @@
         <!-- Poster -->
         <div class="col-md-2">
             <img
-                src="https://placehold.co/180x260?text={{title}}"
+                src="https://placehold.co/180x260?text={{this.filmFormat.film.title}}"
                 class="img-fluid rounded shadow-sm"
-                alt="{{title}}"
+                alt="{{this.filmFormat.film.title}}"
             >
         </div>
 
@@ -48,53 +32,44 @@
         <div class="col-md-10">
 
             <h3 class="fw-bold text-uppercase mb-2">
-                {{title}}
+                {{this.filmFormat.film.title}}
             </h3>
 
             <div class="text-muted mb-3">
-                Director: {{director}}
+                Director: {{this.filmFormat.film.director}}
                 |
-                {{duration}} min
+                {{this.filmFormat.film.duration}} min
             </div>
 
             <!-- FORMATS -->
-            {{#each filmFormat}}
-
+          
                 <div class="mb-4 p-3 bg-light rounded">
 
                     <!-- Format title -->
                     <h5 class="fw-bold text-uppercase mb-3">
-                        {{seansFormat}}
+                        {{filmFormat.seansFormat}}
                     </h5>
 
                     <!-- Showtimes -->
-                    <div class="d-flex flex-wrap gap-2 mb-2">
+                  
 
-                        {{#each showtimes}}
+                    <a
+                        href="/showtime/show/{{id}}"
+                        class="btn btn-warning fw-bold px-4"
+                    >
+                        {{formatHour starttime}}
+                        {{!-- {{startime}} --}}
+                    </a>
 
-                            <a
-                                href="/showtime/show/{{id}}"
-                                class="btn btn-warning fw-bold px-4"
-                            >
-                                {{formatHour starttime}}
-                                {{!-- {{startime}} --}}
-                            </a>
-
-                        {{/each}}
-
-                    </div>
 
                     <!-- Language -->
                     <div class="text-secondary small">
-                        {{dubbing}}
+                        {{filmFormat.dubbing}}
                     </div>
-                    <a class="text-secondary small" href="/showtime/ff/{{id}}"> 
-                        More show times like this
-                    </a>
 
                 </div>
 
-            {{/each}}
+    
 
         </div>
 
