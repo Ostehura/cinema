@@ -34,12 +34,21 @@ export class FilmController {
     return await this.filmFormatService.getLanguages(query);
   }
 
-  @Get()
-  @UseGuards(OptionalJwtAuthGuard)
+  @Get('admin')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   @Render('films/index')
   async listFilms() {
     const films = await this.filmService.findAll();
-    return { films };
+    return { films, activePage: '/film' };
+  }
+
+  @Get()
+  @UseGuards(OptionalJwtAuthGuard)
+  @Render('films/user')
+  async listallFilms() {
+    const films = await this.filmService.findAll();
+    return { films, activePage: '/films/user' };
   }
 
   @Get('view/:id')
@@ -47,8 +56,7 @@ export class FilmController {
   @Render('films/view')
   async viewFilm(@Param('id') id: string) {
     const film = await this.filmService.findById(id);
-    const formats = await this.filmFormatService.findByFilmId(id);
-    return { film, formats, backUrl: '/film' };
+    return { film, backUrl: '/film' };
   }
 
   @Get('new')

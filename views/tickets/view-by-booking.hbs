@@ -1,0 +1,53 @@
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h3 class="mb-0">Ticket Details for Booking #{{bookingId}}</h3>
+                </div>
+                <div class="card-body">
+                    {{#if tickets.length}}
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Movie</th>
+                                        <th>Showtime</th>
+                                        <th>Seat</th>
+                                        <th>Type</th>
+                                        <th>Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{#each tickets}}
+                                        <tr>
+                                            <td>{{@index}}</td>
+                                            <td>{{this.showtime.filmFormat?.film?.title}}</td>
+                                            <td>{{this.showtime.starttime}}</td>
+                                            <td>Row {{this.seatRow}}, Seat {{this.seatNumber}}</td>
+                                            <td>
+                                                <span class="badge bg-{{#if eq this.ticketType 'FULL'}}success{{else}}warning{{/if}}">
+                                                    {{this.ticketType}}
+                                                </span>
+                                            </td>
+                                            <td>${{this.showtime.price}}{{#if (eq this.ticketType 'REDUCED')}} (Discounted){{/if}}</td>
+                                        </tr>
+                                    {{/each}}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="text-center mt-4">
+                            <a href="/booking/my-bookings" class="btn btn-outline-primary">Back to My Bookings</a>
+                        </div>
+                    {{else}}
+                        <div class="alert alert-info">No tickets found for this booking.</div>
+                        <div class="text-center mt-4">
+                            <a href="/booking/my-bookings" class="btn btn-outline-primary">Back to My Bookings</a>
+                        </div>
+                    {{/if}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

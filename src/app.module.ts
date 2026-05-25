@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { LayoutInterceptor } from './auth/layout.interceptor';
 import { GuestMiddleware } from './auth/guest.middleware';
+import { UserMiddleware } from './middleware/user.middleware';
 import { AudithoriumModule } from './audithorium/audithorium.module';
 import {
   Audithorium,
@@ -50,6 +51,15 @@ import { ScheduleModule } from '@nestjs/schedule';
       ],
       synchronize: true,
     }),
+    TypeOrmModule.forFeature([
+      User,
+      Film,
+      FilmFormat,
+      Showtime,
+      Audithorium,
+      Booking,
+      Ticket,
+    ]),
     UsersModule,
     FilmsModule,
     AuthModule,
@@ -71,5 +81,6 @@ import { ScheduleModule } from '@nestjs/schedule';
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(GuestMiddleware).forRoutes('*');
+    consumer.apply(UserMiddleware).forRoutes('*');
   }
 }

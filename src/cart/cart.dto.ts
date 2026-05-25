@@ -1,6 +1,6 @@
 import { Type } from 'class-transformer';
 import { IsEnum, IsInt, IsString } from 'class-validator';
-import { TicketType } from './cart.entity';
+import { TicketType } from 'src/ticket/ticket.entity';
 
 export class CartDto {
   @IsInt()

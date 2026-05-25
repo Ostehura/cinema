@@ -7,6 +7,7 @@ import {
   Redirect,
   Render,
   Req,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { OptionalJwtAuthGuard } from 'src/auth/optionalauth.guard';
@@ -18,11 +19,13 @@ import {
   CartUpdateDto,
   CartViewDto,
 } from './cart.dto';
-import { CartItem, TicketType } from './cart.entity';
+import { CartItem } from './cart.entity';
 import { CartService } from './cart.service';
 import { Money } from 'src/helper/money';
 import { BookingService } from 'src/bookings/booking.service';
 import { addMinutes } from 'src/helper/time';
+import { TicketType } from 'src/ticket/ticket.entity';
+import type { Response } from 'express';
 
 function TicketFare(ticketType: TicketType) {
   return ticketType == TicketType.FULL ? 1 : 0.8;
@@ -187,16 +190,22 @@ export class CartController {
   }
 
   @Post('place')
-  @Redirect('/booking/my')
+  // @Redirect('/booking/my-bookings')
   @UseGuards(OptionalJwtAuthGuard)
   async PlaceOrder(
     @Req() req: RequestWithUser,
     @Body() body: { guest_email?: string },
+    @Res({ passthrough: true }) res: Response,
   ) {
-    return await this.bookingService.placeBooking(
+    const booking = await this.bookingService.placeBooking(
       req.user?.userId ?? null,
       req.cookies.guest_id,
       body.guest_email ?? null,
     );
+    if (req.user) {
+      res.redirect('/booking/my');
+    } else {
+      res.redirect(`/booking/${booking[0].id}`);
+    }
   }
 }

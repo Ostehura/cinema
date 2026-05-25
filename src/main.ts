@@ -8,6 +8,7 @@ import { AllExceptionsFilter } from './http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  app.setViewEngine('hbs');
 
   app.use(cookieParser());
   app.useStaticAssets(join(__dirname, '..', 'public'));
@@ -15,10 +16,7 @@ async function bootstrap() {
   app.set('view options', { layout: 'layouts/main' });
   app.setViewEngine('hbs');
   app.useGlobalFilters(new AllExceptionsFilter());
-  process.on('uncaughtException', (err) => {
-    console.error('UNCAUGHT EXCEPTION:', err);
-  });
-  await app.listen(process.env.PORT ?? 3000);
+
   hbs.handlebars.registerHelper('range', (start: number, end: number) => {
     const arr: number[] = [];
     for (let i = start; i <= end; i++) {
@@ -33,9 +31,6 @@ async function bootstrap() {
     return seatIndex === Math.floor(total / 2);
   });
 
-  hbs.handlebars.registerHelper('eq', (lhs, rhs) => {
-    return lhs === rhs;
-  });
   hbs.handlebars.registerHelper('formatHour', function (date: string) {
     const d = new Date(date);
 
@@ -47,5 +42,23 @@ async function bootstrap() {
   // hbs.handlebars.registerHelper('in', (lhs: any[], rhs) => {
   //   return lhs.includes(rhs);
   // });
+  hbs.handlebars.registerHelper('eq', (a, b) => {
+    return a === b;
+  });
+
+  hbs.handlebars.registerHelper('or', (a, b) => {
+    return Boolean(a) || Boolean(b);
+  });
+  hbs.handlebars.registerHelper('and', (a, b) => {
+    return Boolean(a) && Boolean(b);
+  });
+  hbs.handlebars.registerHelper('add', (a, b) => {
+    return Number(a) + Number(b);
+  });
+
+  process.on('uncaughtException', (err) => {
+    console.error('UNCAUGHT EXCEPTION:', err);
+  });
+  await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

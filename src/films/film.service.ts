@@ -44,7 +44,7 @@ export class FilmService {
   async findById(id: string): Promise<Film> {
     const film = await this.filmRepository.findOne({
       where: { id },
-      relations: { filmFormat: true },
+      relations: { filmFormat: { showtimes: true } },
     });
     if (!film) {
       throw new NotFoundException('Film not found');

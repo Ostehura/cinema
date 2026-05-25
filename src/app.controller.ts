@@ -14,9 +14,9 @@ export class AppController {
   @Get()
   @Render('index')
   @UseGuards(OptionalJwtAuthGuard)
-  async getHello(): Promise<{ films: Film[] }> {
+  async getHello(): Promise<{ films: Film[], activePage:string }> {
     return {
       films: await this.filmService.findAllFilmsWithSeansByWeek(new Date()),
-    };
+     activePage: '/' };
   }
 }

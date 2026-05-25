@@ -21,11 +21,19 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Get('login')
-  @Render('login')
+  @Render('auth/login')
   async logInPage() {}
-  @Get('signup')
-  @Render('register')
+  @Get('register')
+  @Render('auth/register')
   async signUpPage() {}
+
+  @Get('logout')
+  @Redirect('/')
+  logout(@Res() res: Response) {
+    res.clearCookie('access_token');
+    res.clearCookie('refresh_token');
+    return { message: 'Logged out' };
+  }
 
   @UseGuards(OptionalJwtAuthGuard)
   @Redirect('/cart/merge')
@@ -65,6 +73,7 @@ export class AuthController {
 
   @UseGuards(OptionalJwtAuthGuard)
   @Post('register')
+  @Redirect('/auth/login')
   async register(
     @Body()
     registerDto: {

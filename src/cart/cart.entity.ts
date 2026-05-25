@@ -1,5 +1,6 @@
 import { Showtime } from 'src/showtime/showtime.entity';
 import { User } from 'src/users/user.entity';
+import { TicketType } from 'src/ticket/ticket.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -10,11 +11,6 @@ import {
   Column,
   PrimaryColumn,
 } from 'typeorm';
-
-export enum TicketType {
-  FULL = 'full',
-  REDUCED = 'reduced',
-}
 
 @Entity()
 export class Cart {

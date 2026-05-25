@@ -116,4 +116,15 @@ export class AudithoriumController {
     res.redirect(`/audithorium/view/${params.id}`);
     return res;
   }
+
+  @Render('audithorium/manage')
+  @Get('manage')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async getManagePage() {
+    return {
+      audithoriums: await this.audithoriumService.getAllAudithoriums(),
+      date: new Date().toString(),
+    };
+  }
 }

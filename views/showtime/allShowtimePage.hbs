@@ -1,7 +1,10 @@
-<div class="container mt-4">
-   <div class="d-flex flex-wrap gap-2 mb-2">
 
-{{#each days}}
+<div class="container mt-5">
+
+    <div class="container mt-4">
+    <div class="d-flex flex-wrap gap-2 mb-2">
+
+    {{#each days}}
 
         <a
             href="/showtime?date={{url}}&language={{../selectedLanguage}}&format={{../selectedFormat}}"
@@ -46,10 +49,11 @@
 
         <!-- Movie info -->
         <div class="col-md-10">
-
+            <a href="/film/view/{{id}}"> 
             <h3 class="fw-bold text-uppercase mb-2">
                 {{title}}
             </h3>
+            </a>
 
             <div class="text-muted mb-3">
                 Director: {{director}}

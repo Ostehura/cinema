@@ -8,8 +8,8 @@ import {
 import { DataSource, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Booking } from './booking.entity';
-import { Cart, CartItem, TicketType } from 'src/cart/cart.entity';
-import { Ticket } from 'src/ticket/ticket.entity';
+import { Cart, CartItem } from 'src/cart/cart.entity';
+import { Ticket, TicketType } from 'src/ticket/ticket.entity';
 
 @Injectable()
 export class BookingService {
@@ -28,7 +28,11 @@ export class BookingService {
   async findByUserId(userID: string): Promise<Booking[]> {
     return this.bookingRepository.find({
       where: { userID },
-      relations: { showtime: { filmFormat: { film: true } }, tickets: true },
+      relations: {
+        showtime: { filmFormat: { film: true } },
+        tickets: true,
+        user: true,
+      },
       order: { datetime: 'ASC' },
     });
   }
@@ -36,12 +40,28 @@ export class BookingService {
   async findById(id: string): Promise<Booking> {
     const booking = await this.bookingRepository.findOne({
       where: { id },
-      relations: ['user', 'showtime', 'tickets'],
+      relations: {
+        showtime: { filmFormat: { film: true }, audithorium: true },
+        user: true,
+        tickets: true,
+      },
     });
+
     if (!booking) {
       throw new NotFoundException('Booking not found');
     }
+
     return booking;
+  }
+
+  async searchBookings(filter: {
+    userID?: string;
+    guestEmail?: string;
+    datetime?: Date;
+  }): Promise<Booking[]> {
+    console.log(filter);
+    const query = this.bookingRepository.find({ where: filter });
+    return query;
   }
 
   async create(
@@ -58,6 +78,7 @@ export class BookingService {
     }
 
     const totalTickets = amount + amountReduced;
+
     if (totalTickets < 1 || totalTickets > 4) {
       throw new BadRequestException('Total tickets must be between 1 and 4');
     }
@@ -71,11 +92,13 @@ export class BookingService {
       datetime,
       glasses,
     });
+
     return this.bookingRepository.save(booking);
   }
 
   async delete(id: string): Promise<void> {
     const result = await this.bookingRepository.delete(id);
+
     if (result.affected === 0) {
       throw new NotFoundException('Booking not found');
     }
