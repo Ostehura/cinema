@@ -7,6 +7,7 @@ import {
   Redirect,
   Render,
   Req,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { OptionalJwtAuthGuard } from 'src/auth/optionalauth.guard';
@@ -22,7 +23,9 @@ import { CartItem } from './cart.entity';
 import { CartService } from './cart.service';
 import { Money } from 'src/helper/money';
 import { BookingService } from 'src/bookings/booking.service';
-import {TicketType } from 'src/ticket/ticket.entity';
+import { addMinutes } from 'src/helper/time';
+import { TicketType } from 'src/ticket/ticket.entity';
+import type { Response } from 'express';
 
 function TicketFare(ticketType: TicketType) {
   return ticketType == TicketType.FULL ? 1 : 0.8;
@@ -54,6 +57,12 @@ export class CartController {
     if (!cart || !cart.cartItems) {
       return { id: -1, totalFormated: new Money(0, 'PLN').toString() };
     }
+    if (
+      cart.expirationTime &&
+      addMinutes(cart.expirationTime, 5) < new Date()
+    ) {
+      return { id: -1, totalFormated: new Money(0, 'PLN').toString() };
+    }
     let total = new Money(0, 'PLN');
     for (let i = 0; i < cart.cartItems.length; i++) {
       total = total.add(
@@ -64,6 +73,7 @@ export class CartController {
     }
     const res: CartViewDto = {
       id: cart.id,
+      expirationTime: cart.expirationTime ? cart.expirationTime.toString() : '',
       totalFormated: total.toString(),
       cartItems: cart.cartItems.map((item: CartItem) => {
         const cartItemFormated: CartItemViewDto = {
@@ -139,6 +149,13 @@ export class CartController {
     if (!cart || !cart.cartItems) {
       return { id: -1, totalFormated: new Money(0, 'PLN').toString() };
     }
+    if (
+      cart.expirationTime &&
+      addMinutes(cart.expirationTime, 5) < new Date()
+    ) {
+      return { id: -1, totalFormated: new Money(0, 'PLN').toString() };
+    }
+
     let total = new Money(0, 'PLN');
     for (let i = 0; i < cart.cartItems.length; i++) {
       total = total.add(
@@ -172,17 +189,23 @@ export class CartController {
     return res;
   }
 
-   @Post('place')
-   @Redirect('/booking/my-bookings')
-   @UseGuards(OptionalJwtAuthGuard)
-   async PlaceOrder(
-     @Req() req: RequestWithUser,
-     @Body() body: { guest_email?: string },
-   ) {
-     return await this.bookingService.placeBooking(
-       req.user?.userId ?? null,
-       req.cookies.guest_id,
-       body.guest_email ?? null,
-     );
-   }
+  @Post('place')
+  // @Redirect('/booking/my-bookings')
+  @UseGuards(OptionalJwtAuthGuard)
+  async PlaceOrder(
+    @Req() req: RequestWithUser,
+    @Body() body: { guest_email?: string },
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const booking = await this.bookingService.placeBooking(
+      req.user?.userId ?? null,
+      req.cookies.guest_id,
+      body.guest_email ?? null,
+    );
+    if (req.user) {
+      res.redirect('/booking/my');
+    } else {
+      res.redirect(`/booking/${booking[0].id}`);
+    }
+  }
 }

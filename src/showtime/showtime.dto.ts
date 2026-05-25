@@ -1,7 +1,8 @@
 import { Type } from 'class-transformer';
 import { IsDate, IsEnum, IsInt, IsString } from 'class-validator';
 import { Audithorium } from 'src/audithorium/audithorium.entity';
-import { FilmFormat, SeansFormat } from 'src/films/filmFormat.entity';
+import { FilmFormat } from 'src/films/filmFormat.entity';
+import { SeansFormat } from 'src/films/seansFomat.enum';
 
 export class CreateShowTimeDTO {
   @IsString()

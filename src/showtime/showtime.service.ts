@@ -5,14 +5,23 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { And, DataSource, In, LessThan, MoreThan, Repository } from 'typeorm';
+import {
+  And,
+  Between,
+  DataSource,
+  In,
+  LessThan,
+  MoreThan,
+  Repository,
+} from 'typeorm';
 import { Showtime } from './showtime.entity';
-import { FilmFormat, SeansFormat } from 'src/films/filmFormat.entity';
+import { FilmFormat } from 'src/films/filmFormat.entity';
 import {
   Audithorium,
   AudithoriumFormat,
 } from 'src/audithorium/audithorium.entity';
 import { getDateEnd, getDateStart } from './helper';
+import { SeansFormat } from 'src/films/seansFomat.enum';
 
 const BUFFER_MINUTES = 10;
 
@@ -95,7 +104,7 @@ export class ShowtimeService {
         const newShowtime = manager.create(Showtime, {
           audithoriumId: audithoriumId,
           filmFormatId: filmformat.id,
-          price: price,
+          price: price * 100,
           starttime: starttime,
           endtime: newEnd,
         });
@@ -176,20 +185,6 @@ export class ShowtimeService {
     return audithoriums;
   }
 
-  async getShowsByAudithorium(date: Date, audithoriumId: number) {
-    const dayStart = getDateStart(date);
-
-    const dayEnd = getDateEnd(date);
-
-    return this.showtimeRepository.find({
-      where: {
-        audithoriumId: audithoriumId,
-        starttime: And(MoreThan(dayStart), LessThan(dayEnd)),
-      },
-      relations: { filmFormat: { film: true } },
-    });
-  }
-
   async getShowtimePerAudithoriumAndDay(
     audithoriumId: number,
     date: Date,
@@ -201,6 +196,23 @@ export class ShowtimeService {
     return await this.showtimeRepository.find({
       where: {
         audithoriumId: audithoriumId,
+        starttime: And(MoreThan(dayStart), LessThan(dayEnd)),
+      },
+      relations: { filmFormat: { film: true } },
+    });
+  }
+
+  async getShowsPerFormatAndDate(
+    filmFormatId: string,
+    date: Date,
+  ): Promise<Showtime[]> {
+    const dayStart = getDateStart(date);
+
+    const dayEnd = getDateEnd(date);
+
+    return await this.showtimeRepository.find({
+      where: {
+        filmFormatId: filmFormatId,
         starttime: And(MoreThan(dayStart), LessThan(dayEnd)),
       },
       relations: { filmFormat: { film: true } },
@@ -219,5 +231,36 @@ export class ShowtimeService {
       throw new NotFoundException(`No show time found`);
     }
     return show;
+  }
+
+  async GetFilmAvailability(
+    filmFIlter: {
+      filmId?: string;
+      dubbing?: string;
+      id?: string;
+    },
+    begin: Date,
+    numberOfDays: number,
+  ): Promise<{ date: string; disabled: boolean; url: string }[]> {
+    const res: { date: string; disabled: boolean; url: string }[] = [];
+    for (let i = 0; i < numberOfDays; i++) {
+      const day = new Date(begin);
+      day.setDate(day.getDate() + i);
+      const dayStart = getDateStart(day);
+
+      const dayEnd = getDateEnd(day);
+      const shows = await this.showtimeRepository.find({
+        where: { filmFormat: filmFIlter, starttime: Between(dayStart, dayEnd) },
+      });
+      res.push({
+        url: day.toString(),
+        date: day.toLocaleDateString('pl-PL', {
+          day: '2-digit',
+          month: '2-digit',
+        }),
+        disabled: shows.length == 0,
+      });
+    }
+    return res;
   }
 }

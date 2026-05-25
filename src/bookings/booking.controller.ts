@@ -18,6 +18,7 @@ import { JwtAuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { UserRole } from '../users/user.entity';
+import { OptionalJwtAuthGuard } from 'src/auth/optionalauth.guard';
 
 interface RequestWithUser {
   user?: { userId: string; role: string };
@@ -27,55 +28,66 @@ interface RequestWithUser {
 export class BookingController {
   constructor(private readonly bookingService: BookingService) {}
 
-   @Get()
-   @UseGuards(JwtAuthGuard, RolesGuard)
-   @Roles(UserRole.ADMIN)
-   @Render('bookings/index')
-   async listBookings(@Query() query: any) {
-     const bookings = await this.bookingService.searchBookings(query.search);
-     return { bookings, activePage: '/booking' };
-   }
+  @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @Render('bookings/index')
+  async listBookings(
+    @Query() query: { userID: string; guestEmail: string; datetime: string },
+  ) {
+    const bookings = await this.bookingService.searchBookings({
+      userID: query.userID && query.userID != '' ? query.userID : undefined,
+      guestEmail:
+        query.guestEmail && query.guestEmail != ''
+          ? query.guestEmail
+          : undefined,
+      datetime:
+        query.datetime && query.datetime != ''
+          ? new Date(query.datetime)
+          : undefined,
+    });
+    return { bookings, activePage: '/booking' };
+  }
 
   @Get('search')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @Render('bookings/search')
-  async searchForm() {
+  searchForm() {
     return {};
   }
 
+  @Get('view')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @Render('bookings/view')
+  async view() {
+    const bookings = await this.bookingService.findAll();
+    return { bookings };
+  }
 
+  @Get('user/:userId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @Render('bookings/user')
+  async userBookings(@Param('userId') userId: string) {
+    const bookings = await this.bookingService.findByUserId(userId);
+    return { bookings, userId };
+  }
 
-    @Get('view')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(UserRole.ADMIN)
-    @Render('bookings/view')
-    async view(){
-     const bookings = await this.bookingService.findAll();
-     return { bookings };
+  @Get('my-bookings')
+  @UseGuards(JwtAuthGuard)
+  @Render('bookings/user')
+  async myBookings(@Request() req: RequestWithUser) {
+    if (!req.user) {
+      throw new Error('User not found');
     }
-
-   @Get('user/:userId')
-   @UseGuards(JwtAuthGuard, RolesGuard)
-   @Roles(UserRole.ADMIN)
-   @Render('bookings/user')
-   async userBookings(@Param('userId') userId: string) {
-     const bookings = await this.bookingService.findByUserId(userId);
-     return { bookings, userId };
-   }
-
-   @Get('my-bookings')
-   @UseGuards(JwtAuthGuard)
-   @Render('bookings/user')
-   async myBookings(@Request() req: RequestWithUser) {
-     if (!req.user) {
-       throw new Error('User not found');
-     }
-     const bookings = await this.bookingService.findByUserId(req.user.userId);
-     return { bookings, userId: req.user.userId };
-   }
+    const bookings = await this.bookingService.findByUserId(req.user.userId);
+    return { bookings, userId: req.user.userId, userRole: req.user.role };
+  }
 
   @Get('my')
+  @Render('mybookings')
   @UseGuards(JwtAuthGuard)
   async getUserBookings(
     @Param('userId') userId: string,
@@ -95,8 +107,9 @@ export class BookingController {
   }
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.CUSTOMER)
+  @UseGuards(OptionalJwtAuthGuard)
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  // @Roles(UserRole.ADMIN, UserRole.CUSTOMER)
   @Render('bookings/view')
   async viewBooking(@Param('id') id: string) {
     const booking = await this.bookingService.findById(id);
@@ -106,7 +119,7 @@ export class BookingController {
   @Get('new')
   @UseGuards(JwtAuthGuard)
   @Render('bookings/new')
-  async newBookingForm() {
+  newBookingForm() {
     return {};
   }
 
@@ -148,19 +161,21 @@ export class BookingController {
     if (!req.user) {
       throw new Error('User have no access to page!');
     }
-    
+
     // Check if booking can be deleted (must be at least 4 hours before showtime)
     if (booking.showtime) {
       const showtime = new Date(booking.showtime.starttime);
       const currentTime = new Date();
       const timeDifference = showtime.getTime() - currentTime.getTime();
       const hoursDifference = timeDifference / (1000 * 60 * 60);
-      
+
       if (hoursDifference < 4) {
-        throw new Error('Booking cannot be deleted less than 4 hours before showtime');
+        throw new Error(
+          'Booking cannot be deleted less than 4 hours before showtime',
+        );
       }
     }
-    
+
     if (String(req.user.role) === String(UserRole.ADMIN)) {
       await this.bookingService.delete(id);
     } else if (

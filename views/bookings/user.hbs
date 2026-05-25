@@ -27,16 +27,17 @@
                   <tr>
                     <td>{{@index}}</td>
                     <td>{{this.showtime.starttime}}</td>
-                    <td>{{this.showtime.filmFormat?.film?.title}}</td>
-                    <td>{{this.showtime.filmFormat?.seansFormat}}</td>
+                    <td>{{this.showtime.filmFormat.film.title}}</td>
+                    <td>{{this.showtime.filmFormat.seansFormat}}</td>
                     <td>{{this.amount}} Full, {{this.amountReduced}} Reduced</td>
-                    <td>{{#if this.guestEmail}}{{this.guestEmail}}{{else}}{{this.user?.email}}{{/if}}</td>
+                    <td>{{#if this.guestEmail}}{{this.guestEmail}}{{else}}{{this.user.email}}{{/if}}</td>
                     <td>
                       {{#if (or (eq ../userRole 'ADMIN') (and (eq ../userRole 'CUSTOMER') (eq ../userId this.userID)))}}
                       <form action="/booking/{{this.id}}" method="POST" onsubmit="return confirm('Are you sure you want to delete this booking?');" class="d-inline">
                         <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                       </form>
                       {{/if}}
+                      <a class="btn btn-info btn-sm" href="/booking/{{this.id}}">Details </a>
                     </td>
                   </tr>
                   {{/each}}
@@ -46,8 +47,7 @@
             {{else}}
             <div class="alert alert-info">No bookings found for this user.</div>
             {{/if}}
-            <a href="/booking/user/{{userId}}" class="btn btn-outline-secondary">Refresh</a>
-            <a href="/booking" class="btn btn-outline-primary">Back to All Bookings</a>
+            <a href="/booking/my-bookings" class="btn btn-outline-secondary">Refresh</a>
           </div>
         </div>
       </div>

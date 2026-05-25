@@ -8,13 +8,7 @@ import {
 } from 'typeorm';
 import { Film } from './film.entity';
 import { Showtime } from 'src/showtime/showtime.entity';
-
-export enum SeansFormat {
-  IMAX = 'IMAX',
-  F2D = '2D',
-  F3D = '3D',
-  F4DX = '4DX',
-}
+import { SeansFormat } from './seansFomat.enum';
 
 @Entity()
 export class FilmFormat {

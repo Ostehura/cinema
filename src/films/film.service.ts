@@ -3,7 +3,7 @@ import { NotFoundException } from '@nestjs/common';
 import { Between, ILike, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { getDateEnd, getDateStart } from 'src/showtime/helper';
-import { truncate } from 'fs';
+import { SeansFormat } from './seansFomat.enum';
 
 export class FilmService {
   constructor(
@@ -44,7 +44,7 @@ export class FilmService {
   async findById(id: string): Promise<Film> {
     const film = await this.filmRepository.findOne({
       where: { id },
-      relations: { filmFormat: {showtimes: true} },
+      relations: { filmFormat: { showtimes: true } },
     });
     if (!film) {
       throw new NotFoundException('Film not found');
@@ -75,9 +75,30 @@ export class FilmService {
     });
   }
 
-  async findAllFilmsWithSeansByDay(date: Date): Promise<Film[]> {
+  async findAllFilmsWithSeansByDay(
+    date: Date,
+    filter?: { dubbing?: string; seansFormat?: SeansFormat },
+  ): Promise<Film[]> {
     const today = getDateStart(date);
     const weekEnd = getDateEnd(date);
+    return this.filmRepository.find({
+      relations: { filmFormat: { showtimes: true } },
+      where: {
+        filmFormat: {
+          showtimes: { starttime: Between(today, weekEnd) },
+          ...filter,
+        },
+      },
+      order: {
+        filmFormat: { showtimes: { starttime: 'ASC' } },
+      },
+    });
+  }
+
+  async findAllFilmsWithSeansByWeek(date: Date): Promise<Film[]> {
+    const today = getDateStart(date);
+    const weekEnd = new Date(date);
+    weekEnd.setDate(getDateEnd(date).getDate() + 7);
 
     return this.filmRepository.find({
       relations: { filmFormat: { showtimes: true } },

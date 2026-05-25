@@ -29,7 +29,7 @@
         <div id="shows"></div>
 
         <!-- selected marker -->
-        <div id="selection" class="position-absolute bg-primary" style="height: 4px; width: 100%; display:none;"></div>
+        <div id="selection" class="position-absolute bg-primary" style="height: 4px; width: 100%; display:none; opacity: 0.8"></div>
     </div>
 
     <div class="mt-2">
@@ -286,6 +286,7 @@ timeline.addEventListener('click', (e) => {
     // show marker
     selection.style.display = 'block';
     selection.style.top = (y - 2) + 'px';
+    selection.style.height = (selectedMovie.duration / 60) * HOUR_HEIGHT + 'px';
 
     selectedTimeText.innerText = time;
     const fulltime = new Date( dateInput.value);

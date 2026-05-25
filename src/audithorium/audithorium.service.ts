@@ -7,7 +7,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Audithorium, AudithoriumFormat } from './audithorium.entity';
 import { Repository } from 'typeorm';
 import { AudithoriumFormatDTO } from './audithoriumFormatsDTO';
-import { SeansFormat } from 'src/films/filmFormat.entity';
+import { SeansFormat } from 'src/films/seansFomat.enum';
+
 
 @Injectable()
 export class AudithoriumService {

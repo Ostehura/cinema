@@ -9,8 +9,7 @@ import { DataSource, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Booking } from './booking.entity';
 import { Cart, CartItem } from 'src/cart/cart.entity';
-import { Ticket,  TicketType  } from 'src/ticket/ticket.entity';
-import { validate as isUUID } from 'uuid';
+import { Ticket, TicketType } from 'src/ticket/ticket.entity';
 
 @Injectable()
 export class BookingService {
@@ -22,14 +21,30 @@ export class BookingService {
 
   async findAll(): Promise<Booking[]> {
     return this.bookingRepository.find({
-      relations: ['user', 'showtime'],
+      relations: ['user', 'showtime', 'tickets'],
+    });
+  }
+
+  async findByUserId(userID: string): Promise<Booking[]> {
+    return this.bookingRepository.find({
+      where: { userID },
+      relations: {
+        showtime: { filmFormat: { film: true } },
+        tickets: true,
+        user: true,
+      },
+      order: { datetime: 'ASC' },
     });
   }
 
   async findById(id: string): Promise<Booking> {
     const booking = await this.bookingRepository.findOne({
       where: { id },
-      relations: ['user', 'showtime'],
+      relations: {
+        showtime: { filmFormat: { film: true }, audithorium: true },
+        user: true,
+        tickets: true,
+      },
     });
 
     if (!booking) {
@@ -39,37 +54,15 @@ export class BookingService {
     return booking;
   }
 
-  async findByUserId(userID: string): Promise<Booking[]> {
-    return this.bookingRepository.find({
-      where: {
-        userID,
-      },
-      relations: ['user', 'showtime'],
-    });
+  async searchBookings(filter: {
+    userID?: string;
+    guestEmail?: string;
+    datetime?: Date;
+  }): Promise<Booking[]> {
+    console.log(filter);
+    const query = this.bookingRepository.find({ where: filter });
+    return query;
   }
-
-  async searchBookings(search: string): Promise<Booking[]> {
-    const query = this.bookingRepository
-      .createQueryBuilder('booking')
-      .leftJoinAndSelect('booking.user', 'user')
-      .leftJoinAndSelect('booking.showtime', 'showtime');
-
-    if (isUUID(search)) {
-      query.where('booking.id = :search', { search });
-    } else {
-      query.where(
-        `
-        user.email ILIKE :search
-        OR booking.guestEmail ILIKE :search
-        `,
-        {
-          search: `%${search}%`,
-        },
-      );
-    }
-
-  return query.getMany();
-}
 
   async create(
     showtimeID: number,
@@ -87,9 +80,7 @@ export class BookingService {
     const totalTickets = amount + amountReduced;
 
     if (totalTickets < 1 || totalTickets > 4) {
-      throw new BadRequestException(
-        'Total tickets must be between 1 and 4',
-      );
+      throw new BadRequestException('Total tickets must be between 1 and 4');
     }
 
     const booking = this.bookingRepository.create({
@@ -172,14 +163,21 @@ export class BookingService {
             throw new InternalServerErrorException('Can not create reseration');
           }
           for (let j = 0; j < cartItem.length; j++) {
-            const ticket = manager.create(Ticket, {
-              bookingID: savedBooking.id,
-              showtimeID: savedBooking.showtimeID,
-              seatRow: cartItem[j].row,
-              seatNumber: cartItem[j].column,
-              ticketType: cartItem[j].ticketType,
-            });
-            await manager.insert(Ticket, ticket);
+            try {
+              const ticket = manager.create(Ticket, {
+                bookingID: savedBooking.id,
+                showtimeID: savedBooking.showtimeID,
+                seatRow: cartItem[j].row,
+                seatNumber: cartItem[j].column,
+                ticketType: cartItem[j].ticketType,
+              });
+              await manager.insert(Ticket, ticket);
+            } catch (e: any) {
+              console.log(e);
+              throw new BadRequestException(
+                `Place ${cartItem[j].column} row ${cartItem[j].row} is taken!`,
+              );
+            }
           }
           bookings.push(savedBooking);
         }

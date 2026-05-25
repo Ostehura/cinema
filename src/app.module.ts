@@ -25,9 +25,11 @@ import { BookingModule } from './bookings/booking.module';
 import { CartModule } from './cart/cart.module';
 import { Cart, CartItem } from './cart/cart.entity';
 import { AdminModule } from './admin/admin.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
@@ -49,11 +51,19 @@ import { AdminModule } from './admin/admin.module';
       ],
       synchronize: true,
     }),
-    TypeOrmModule.forFeature([User, Film, FilmFormat, Showtime, Audithorium, Booking, Ticket]),
+    TypeOrmModule.forFeature([
+      User,
+      Film,
+      FilmFormat,
+      Showtime,
+      Audithorium,
+      Booking,
+      Ticket,
+    ]),
     UsersModule,
+    FilmsModule,
     AuthModule,
     AudithoriumModule,
-    FilmsModule,
     ShowtimeModule,
     CartModule,
     AdminModule,

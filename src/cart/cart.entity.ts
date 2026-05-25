@@ -12,8 +12,6 @@ import {
   PrimaryColumn,
 } from 'typeorm';
 
-
-
 @Entity()
 export class Cart {
   @PrimaryGeneratedColumn()
@@ -28,6 +26,9 @@ export class Cart {
 
   @Column({ nullable: true })
   guestId?: string;
+
+  @Column({ nullable: true, type: 'timestamptz' })
+  expirationTime?: Date;
 
   @OneToMany(() => CartItem, (cartItem) => cartItem.cart)
   cartItems?: CartItem[];

@@ -1,4 +1,4 @@
-import { SeansFormat } from 'src/films/filmFormat.entity';
+import { SeansFormat } from 'src/films/seansFomat.enum';
 import { Showtime } from 'src/showtime/showtime.entity';
 import {
   Column,

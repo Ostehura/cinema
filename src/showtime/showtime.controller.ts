@@ -29,12 +29,15 @@ import type { RequestWithUser } from 'src/helper/requestWIthUser';
 import { OptionalJwtAuthGuard } from 'src/auth/optionalauth.guard';
 import { FilmService } from 'src/films/film.service';
 import { TicketService } from 'src/ticket/ticket.service';
+import { SeansFormat } from 'src/films/seansFomat.enum';
+import { FilmFormatService } from 'src/films/filmFormat.service';
 
 @Controller('showtime')
 export class ShowtimeController {
   constructor(
     private readonly showtimeService: ShowtimeService,
     private readonly filmService: FilmService,
+    private readonly filmFormatService: FilmFormatService,
     private cartServise: CartService,
     private readonly ticketService: TicketService,
   ) {}
@@ -59,7 +62,10 @@ export class ShowtimeController {
     @Query('audithorium') auditoriumId: number,
     @Query('date') date: Date,
   ) {
-    return await this.showtimeService.getShowsByAudithorium(date, auditoriumId);
+    return await this.showtimeService.getShowtimePerAudithoriumAndDay(
+      auditoriumId,
+      date,
+    );
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -195,12 +201,25 @@ export class ShowtimeController {
   @UseGuards(OptionalJwtAuthGuard)
   @Render('showtime/allShowtimePage')
   @Get()
-  async getShowPage(@Query('date') rowDate?: string) {
+  async getShowPage(
+    @Query('date') rowDate?: string,
+    @Query('language') language?: string,
+    @Query('format') format?: string,
+  ) {
     let date: Date;
     if (rowDate) {
       date = new Date(rowDate);
     } else {
       date = new Date();
+    }
+    const filters: { dubbing?: string; seansFormat?: SeansFormat } = {};
+    if (language) {
+      filters.dubbing = language;
+    }
+    if (format) {
+      if (Object.values(SeansFormat).includes(format as SeansFormat)) {
+        filters.seansFormat = format as SeansFormat;
+      }
     }
     const weekDates: { title: string; url: string }[] = [];
     for (let i = 0; i <= 7; i++) {
@@ -214,9 +233,47 @@ export class ShowtimeController {
         url: day.toDateString(),
       });
     }
+    const films = await this.filmService.findAllFilmsWithSeansByDay(
+      date,
+      filters,
+    );
+    const languages = await this.filmFormatService.getLanguages();
     return {
       days: weekDates,
-      films: await this.filmService.findAllFilmsWithSeansByDay(date),
+      selectedDay: rowDate,
+      selectedLanguage: language,
+      languages: languages,
+      selectedFormat: format,
+      formats: Object.values(SeansFormat),
+      films: films,
+    };
+  }
+
+  @UseGuards(OptionalJwtAuthGuard)
+  @Render('showtime/filmformatShows')
+  @Get('ff/:id')
+  async getShowTimeByFilmFormat(
+    @Param('id') filmFormatId: string,
+    @Query('date') rowDate?: string,
+  ) {
+    let date: Date;
+    if (rowDate) {
+      date = new Date(rowDate);
+    } else {
+      date = new Date();
+    }
+    return {
+      filmFormatId: filmFormatId,
+      selectedDay: rowDate,
+      days: await this.showtimeService.GetFilmAvailability(
+        { id: filmFormatId },
+        new Date(),
+        7,
+      ),
+      films: await this.showtimeService.getShowsPerFormatAndDate(
+        filmFormatId,
+        date,
+      ),
     };
   }
 }

@@ -1,6 +1,6 @@
 import { Type } from 'class-transformer';
 import { IsEnum, IsInt, IsString } from 'class-validator';
-import {TicketType } from 'src/ticket/ticket.entity';
+import { TicketType } from 'src/ticket/ticket.entity';
 
 export class CartDto {
   @IsInt()
@@ -50,6 +50,7 @@ export class CartViewDto {
   id!: number;
   cartItems?: CartItemViewDto[];
   totalFormated!: string;
+  expirationTime?: string;
 }
 export class CartItemDeleteDto {
   @Type(() => Number)

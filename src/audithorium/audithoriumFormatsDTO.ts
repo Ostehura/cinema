@@ -1,6 +1,6 @@
 import { Type } from 'class-transformer';
 import { IsArray, IsEnum, IsNumber } from 'class-validator';
-import { SeansFormat } from 'src/films/filmFormat.entity';
+import { SeansFormat } from 'src/films/seansFomat.enum';
 
 export class AudithoriumFormatDTO {
   @IsNumber()

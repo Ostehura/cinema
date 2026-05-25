@@ -4,26 +4,19 @@ import cookieParser from 'cookie-parser';
 import { join } from 'node:path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as hbs from 'hbs';
-import { DatabaseSeeder } from './seeds/database.seed';
-import { Connection } from 'typeorm';
-
-
+import { AllExceptionsFilter } from './http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  const helpers = require('handlebars-helpers')();
-
   app.setViewEngine('hbs');
-
-  
 
   app.use(cookieParser());
   app.useStaticAssets(join(__dirname, '..', 'public'));
-  app.setBaseViewsDir(join(__dirname, '..',  'views'));
+  app.setBaseViewsDir(join(__dirname, '..', 'views'));
   app.set('view options', { layout: 'layouts/main' });
   app.setViewEngine('hbs');
+  app.useGlobalFilters(new AllExceptionsFilter());
 
-  // Register Handlebars helpers
   hbs.handlebars.registerHelper('range', (start: number, end: number) => {
     const arr: number[] = [];
     for (let i = start; i <= end; i++) {
@@ -38,7 +31,6 @@ async function bootstrap() {
     return seatIndex === Math.floor(total / 2);
   });
 
- 
   hbs.handlebars.registerHelper('formatHour', function (date: string) {
     const d = new Date(date);
 
@@ -55,20 +47,14 @@ async function bootstrap() {
   });
 
   hbs.handlebars.registerHelper('or', (a, b) => {
-    return a || b;
+    return Boolean(a) || Boolean(b);
   });
   hbs.handlebars.registerHelper('and', (a, b) => {
-    return a && b;
+    return Boolean(a) && Boolean(b);
   });
   hbs.handlebars.registerHelper('add', (a, b) => {
-    return a + b;
+    return Number(a) + Number(b);
   });
-
-
-  // Run database seeder
-  const connection = app.get(Connection);
-  const seeder = app.get(DatabaseSeeder);
-  await seeder.seed();
 
   process.on('uncaughtException', (err) => {
     console.error('UNCAUGHT EXCEPTION:', err);

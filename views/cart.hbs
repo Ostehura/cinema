@@ -1,3 +1,4 @@
+
 <div class="container my-5">
   <h1 class="mb-4">Shopping Cart</h1>
 
@@ -72,6 +73,36 @@
       </table>
     </div>
 
+    
+    <div class="container py-4">
+        <div class="card shadow-sm border-0 rounded-4 p-4">
+
+            <div class="d-flex justify-content-between mb-2">
+                <span class="fw-semibold">
+                    Your cinema seats are reserved
+                </span>
+
+                <span id="timeText" class="text-info fw-bold">
+                    20:00
+                </span>
+            </div>
+
+            <div class="progress" style="height: 12px;">
+                <div
+                    id="timerBar"
+                    class="progress-bar bg-info progress-bar-striped progress-bar-animated"
+                    role="progressbar"
+                    style="width: 100%">
+                </div>
+            </div>
+
+            <small class="text-muted mt-2 d-block">
+                Complete payment before reservation expires.
+            </small>
+
+        </div>
+    </div>
+
     <div class="row justify-content-end mt-4">
       <div class="col-md-4">
         <div class="card">
@@ -101,4 +132,69 @@
       <a href="/" class="alert-link">Let`s find you some new films!</a>
     </div>
   {{/if}}
+  <script>
+    const endTime = new Date("{{expirationTime}}");
+
+    const backendTimeLeft = Math.round((endTime.getTime() - new Date().getTime())/1000);
+
+    const maxReservationTime = 20 * 60;
+    let timeLeft = Math.min(backendTimeLeft, maxReservationTime);
+
+    const timerBar = document.getElementById('timerBar');
+    const timeText = document.getElementById('timeText');
+
+    function updateTimer() {
+
+        // Format MM:SS
+        const minutes = Math.floor(timeLeft / 60)
+            .toString()
+            .padStart(2, '0');
+
+        const seconds = (timeLeft % 60)
+            .toString()
+            .padStart(2, '0');
+
+        timeText.innerText = `${minutes}:${seconds}`;
+
+        // Progress %
+        const percentage = (timeLeft / maxReservationTime) * 100;
+
+        timerBar.style.width = `${percentage}%`;
+
+        // Optional color changes
+        if (percentage <= 25) {
+            timerBar.classList.remove('bg-warning');
+            timerBar.classList.remove('bg-info');
+            timerBar.classList.add('bg-danger');
+            timeText.classList.remove('text-warning');
+            timeText.classList.remove('text-info');
+            timeText.classList.add('text-danger');
+        }
+        else if (percentage <= 50) {
+            timerBar.classList.remove('bg-danger');
+            timerBar.classList.remove('bg-info');
+            timerBar.classList.add('bg-warning');
+            timeText.classList.remove('text-danger');
+            timeText.classList.remove('text-info');
+            timeText.classList.add('text-warning');
+        }
+
+        // Expired
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+
+            timeText.innerText = 'Expired';
+
+            timerBar.style.width = '0%';
+
+            // Optional redirect/modal
+            alert('Reservation expired');
+        }
+
+        timeLeft--;
+    }
+
+    updateTimer();
+    const timerInterval = setInterval(updateTimer, 1000);
+</script>
 </div>
