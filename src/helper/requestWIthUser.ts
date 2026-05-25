@@ -1,6 +1,11 @@
 import { Request } from 'express';
-import { User } from 'src/users/user.entity';
+import { UserRole } from 'src/users/user.entity';
 
+export class UserPayload {
+  userId!: string;
+  email!: string;
+  role!: UserRole;
+}
 export interface RequestWithUser extends Request {
-  user?: User;
+  user?: UserPayload;
 }

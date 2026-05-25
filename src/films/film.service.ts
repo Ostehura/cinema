@@ -1,7 +1,9 @@
 import { Film } from './film.entity';
 import { NotFoundException } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Between, ILike, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { getDateEnd, getDateStart } from 'src/showtime/helper';
+import { SeansFormat } from './seansFomat.enum';
 
 export class FilmService {
   constructor(
@@ -64,5 +66,48 @@ export class FilmService {
     if (result.affected === 0) {
       throw new NotFoundException('Film not found');
     }
+  }
+
+  async searchFilmsByName(name: string): Promise<Film[]> {
+    return await this.filmRepository.find({
+      where: { title: ILike(`%${name}%`) },
+      relations: { filmFormat: true },
+    });
+  }
+
+  async findAllFilmsWithSeansByDay(
+    date: Date,
+    filter?: { dubbing?: string; seansFormat?: SeansFormat },
+  ): Promise<Film[]> {
+    const today = getDateStart(date);
+    const weekEnd = getDateEnd(date);
+    return this.filmRepository.find({
+      relations: { filmFormat: { showtimes: true } },
+      where: {
+        filmFormat: {
+          showtimes: { starttime: Between(today, weekEnd) },
+          ...filter,
+        },
+      },
+      order: {
+        filmFormat: { showtimes: { starttime: 'ASC' } },
+      },
+    });
+  }
+
+  async findAllFilmsWithSeansByWeek(date: Date): Promise<Film[]> {
+    const today = getDateStart(date);
+    const weekEnd = new Date(date);
+    weekEnd.setDate(getDateEnd(date).getDate() + 7);
+
+    return this.filmRepository.find({
+      relations: { filmFormat: { showtimes: true } },
+      where: {
+        filmFormat: { showtimes: { starttime: Between(today, weekEnd) } },
+      },
+      order: {
+        filmFormat: { showtimes: { starttime: 'ASC' } },
+      },
+    });
   }
 }

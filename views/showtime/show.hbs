@@ -1,0 +1,176 @@
+<a href="/showtime"> Back to list</a>
+<h1>Audithorium: {{audithorium.name}}</h1>
+
+<style>
+    .title {
+  margin-bottom: 20px;
+}
+
+.cinema-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* SCREEN */
+.screen {
+  width: 70%;
+  height: 60px;
+  background: linear-gradient(to bottom, #eee, #bbb);
+  border-radius: 50% / 20%;
+  text-align: center;
+  line-height: 60px;
+  font-weight: bold;
+  margin-bottom: 40px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
+
+/* SEATING AREA */
+.seating {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ROW */
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ROW LABEL */
+.row-label {
+  width: 30px;
+  text-align: right;
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+/* SEAT */
+.seat {
+  width: 22px;
+  height: 22px;
+  background-color: #4CAF50;
+  margin: 3px;
+  border-radius: 4px;
+  transition: 0.2s;
+}
+
+.your_seat {
+  width: 22px;
+  height: 22px;
+  background-color: #0000A0;
+  margin: 3px;
+  border-radius: 4px;
+  transition: 0.2s;
+}
+
+.taken {
+  width: 22px;
+  height: 22px;
+  background-color: #383839;
+  margin: 3px;
+  border-radius: 4px;
+  transition: 0.2s;
+}
+
+.seat:hover {
+  background-color: #66bb6a;
+  transform: scale(1.2);
+  cursor: pointer;
+}
+
+.your_seat:hover {
+  width: 22px;
+  height: 22px;
+  background-color: #7070ff;
+  margin: 3px;
+  border-radius: 4px;
+  transition: 0.2s;
+}
+
+/* AISLE SPACE */
+.aisle {
+  width: 20px;
+}
+</style>
+
+
+<h1>{{filmFormat.film.title}}</h1>
+<b>{{filmFormat.film.director}}</b><br/>
+<b>{{starttime}}</b>
+<p>duration <b>{{filmFormat.film.duration}} min</b> | dubbing <b>{{filmFormat.dubbing}}</b> | format <b>{{filmFormat.seansFormat}}</b></p>
+<p>{{filmFormat.film.description}}</p>
+
+<hr />
+
+<h2 class="title">Schematic View</h2>
+
+<div class="cinema-container">
+
+  <!-- SCREEN -->
+  <div class="screen">SCREEN</div>
+
+  <!-- SEATS -->
+  <div class="seating">
+    {{#each (range 1 audithorium.number_of_rows)}}
+      <div class="row">
+        <div class="row-label">
+          {{toChar @index}}
+        </div>
+
+        {{#each (range 1 ../audithorium.number_of_seats_in_row)}}
+          <div class="seat" id="{{@../index}}_{{@index}}" onclick="sendRequest(this)"></div>
+
+          <!-- aisle in the middle -->
+          {{#if (isMiddle this ../../audithorium.number_of_seats_in_row)}}
+            <div class="aisle"></div>
+          {{/if}}
+
+        {{/each}}
+      </div>
+    {{/each}}
+  </div>
+
+</div>
+
+<script>
+  const seansId = {{{id}}};
+  const reserved = {{{yourSeats}}};
+  const taken = {{{takenSeats}}};
+  async function  sendRequest(node)
+  {
+    const [row, seat] = node.id.split("_");
+    const obj = {row: row,column : seat, seansId : seansId }
+
+    await fetch(`/cart/add`,{method:'POST',  headers: {
+      'Content-Type': 'application/json'
+    }, body: JSON.stringify(obj)});
+    window.location.reload();
+  }
+  function setReserved(reserved)
+  {
+    reserved.forEach((seat)=> {
+      const location =document.getElementById(`${seat.row}_${seat.column}`);
+      location.classList.remove('seat');
+      location.classList.add('your_seat');
+    })
+    
+
+  }
+  setReserved(reserved);
+   function setTaken(taken)
+  {
+    taken.forEach((seat)=> {
+      const location =document.getElementById(`${seat.row}_${seat.column}`);
+      location.classList.remove('seat');
+      location.classList.add('taken');
+      location.onclick=()=>{};
+    })
+    
+
+  }
+  setTaken(taken);
+</script>

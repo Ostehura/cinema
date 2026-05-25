@@ -15,10 +15,20 @@ import {
 } from './audithorium/audithorium.entity';
 import { Film } from './films/film.entity';
 import { FilmFormat } from './films/filmFormat.entity';
+import { Booking } from './bookings/booking.entity';
+import { Ticket } from './ticket/ticket.entity';
 import { FilmsModule } from './films/film.module';
+import { ShowtimeModule } from './showtime/showtime.module';
+import { Showtime } from './showtime/showtime.entity';
+import { BookingModule } from './bookings/booking.module';
+import { CartModule } from './cart/cart.module';
+import { Cart, CartItem } from './cart/cart.entity';
+import { AdminModule } from './admin/admin.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
@@ -26,13 +36,28 @@ import { FilmsModule } from './films/film.module';
       username: 'postgres',
       password: 'password',
       database: 'cinema',
-      entities: [User, Film, FilmFormat, Audithorium, AudithoriumFormat],
+      entities: [
+        User,
+        Film,
+        FilmFormat,
+        Audithorium,
+        AudithoriumFormat,
+        Showtime,
+        Cart,
+        CartItem,
+        Booking,
+        Ticket,
+      ],
       synchronize: true,
     }),
     UsersModule,
+    FilmsModule,
     AuthModule,
     AudithoriumModule,
-    FilmsModule,
+    ShowtimeModule,
+    CartModule,
+    AdminModule,
+    BookingModule,
   ],
   controllers: [AppController],
   providers: [

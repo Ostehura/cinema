@@ -1,0 +1,200 @@
+
+<div class="container my-5">
+  <h1 class="mb-4">Shopping Cart</h1>
+
+  {{#if cartItems.length}}
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Film</th>
+            <th class="text-center">Seat</th>
+            <th class="text-center">Type</th>
+            <th class="text-end">Price</th>
+            <th></th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {{#each cartItems}}
+            <tr>
+              <td>
+                <a href="/showtime/show/{{this.seansId}}">
+                <div class="fw-semibold">
+                  {{{this.filmname}}}
+                </div>
+                </a>
+              </td>
+              <td>
+                row <b>{{this.row}}</b><br/>
+                seat <b>{{this.column}}</b>
+              </td>
+
+              <td class="text-center">
+                <form
+                  method="POST"
+                  action="/cart/update"
+                  class="d-flex justify-content-center gap-2"
+                >
+                  <input type="hidden" name="column" value="{{this.column}}" />
+                  <input type="hidden" name="row" value="{{this.row}}" />
+                  <input type="hidden" name="seansId" value="{{this.seansId}}" />
+                  <select name="ticketType" id="ticketType">
+                    <option value="full" {{#if (eq this.ticketType "full")}}selected{{/if}}>Full</option>
+                    <option value="reduced" {{#if (eq this.ticketType "reduced")}}selected{{/if}}>Reduced</option>
+                  </select>
+                  <button class="btn btn-outline-secondary btn-sm" type="submit">
+                    Update
+                  </button>
+                </form>
+              </td>
+
+              <td class="text-end fw-semibold">
+                {{this.subototalForamted}}
+              </td>
+
+              <td class="text-end">
+                <form method="POST" action="/cart/remove">
+                  <input type="hidden" name="column" value="{{this.column}}" />
+                  <input type="hidden" name="row" value="{{this.row}}" />
+                  <input type="hidden" name="seansId" value="{{this.seansId}}" />
+                  <button
+                    type="submit"
+                    class="btn btn-outline-danger btn-sm"
+                    title="Remove"
+                  >
+                    ✕
+                  </button>
+                </form>
+              </td>
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+
+    
+    <div class="container py-4">
+        <div class="card shadow-sm border-0 rounded-4 p-4">
+
+            <div class="d-flex justify-content-between mb-2">
+                <span class="fw-semibold">
+                    Your cinema seats are reserved
+                </span>
+
+                <span id="timeText" class="text-info fw-bold">
+                    20:00
+                </span>
+            </div>
+
+            <div class="progress" style="height: 12px;">
+                <div
+                    id="timerBar"
+                    class="progress-bar bg-info progress-bar-striped progress-bar-animated"
+                    role="progressbar"
+                    style="width: 100%">
+                </div>
+            </div>
+
+            <small class="text-muted mt-2 d-block">
+                Complete payment before reservation expires.
+            </small>
+
+        </div>
+    </div>
+
+    <div class="row justify-content-end mt-4">
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title d-flex justify-content-between">
+              <span>Total</span>
+              <span>{{totalFormated}}</span>
+            </h5>
+             
+              <a
+                type="submit"
+                class="btn btn-primary w-100 mt-3"
+                title=" Proceed to Checkout"
+                href="/cart/place"
+              >
+                Proceed to Checkout
+              </a>
+               
+          </div>
+        </div>
+      </div>
+    </div>
+
+  {{else}}
+    <div class="alert alert-info">
+      Your cart is empty.
+      <a href="/" class="alert-link">Let`s find you some new films!</a>
+    </div>
+  {{/if}}
+  <script>
+    const endTime = new Date("{{expirationTime}}");
+
+    const backendTimeLeft = Math.round((endTime.getTime() - new Date().getTime())/1000);
+
+    const maxReservationTime = 20 * 60;
+    let timeLeft = Math.min(backendTimeLeft, maxReservationTime);
+
+    const timerBar = document.getElementById('timerBar');
+    const timeText = document.getElementById('timeText');
+
+    function updateTimer() {
+
+        // Format MM:SS
+        const minutes = Math.floor(timeLeft / 60)
+            .toString()
+            .padStart(2, '0');
+
+        const seconds = (timeLeft % 60)
+            .toString()
+            .padStart(2, '0');
+
+        timeText.innerText = `${minutes}:${seconds}`;
+
+        // Progress %
+        const percentage = (timeLeft / maxReservationTime) * 100;
+
+        timerBar.style.width = `${percentage}%`;
+
+        // Optional color changes
+        if (percentage <= 25) {
+            timerBar.classList.remove('bg-warning');
+            timerBar.classList.remove('bg-info');
+            timerBar.classList.add('bg-danger');
+            timeText.classList.remove('text-warning');
+            timeText.classList.remove('text-info');
+            timeText.classList.add('text-danger');
+        }
+        else if (percentage <= 50) {
+            timerBar.classList.remove('bg-danger');
+            timerBar.classList.remove('bg-info');
+            timerBar.classList.add('bg-warning');
+            timeText.classList.remove('text-danger');
+            timeText.classList.remove('text-info');
+            timeText.classList.add('text-warning');
+        }
+
+        // Expired
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+
+            timeText.innerText = 'Expired';
+
+            timerBar.style.width = '0%';
+
+            // Optional redirect/modal
+            alert('Reservation expired');
+        }
+
+        timeLeft--;
+    }
+
+    updateTimer();
+    const timerInterval = setInterval(updateTimer, 1000);
+</script>
+</div>

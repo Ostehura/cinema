@@ -1,0 +1,78 @@
+<div class="container my-5">
+  <h1 class="mb-4">Shopping Cart</h1>
+
+  {{#if cartItems.length}}
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Film</th>
+            <th class="text-center">Seat</th>
+            <th class="text-center">Type</th>
+            <th class="text-end">Price</th>
+            <th></th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {{#each cartItems}}
+            <tr>
+              <td>
+                <a href="/showtime/show/{{this.seansId}}">
+                <div class="fw-semibold">
+                  {{{this.filmname}}}
+                </div>
+                </a>
+              </td>
+              <td>
+                row <b>{{this.row}}</b><br/>
+                seat <b>{{this.column}}</b>
+              </td>
+
+              <td class="text-center">
+                {{this.ticketType}}
+              </td>
+
+              <td class="text-end fw-semibold">
+                {{this.subototalForamted}}
+              </td>
+
+              <td class="text-end">
+              </td>
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="row justify-content-end mt-4">
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title d-flex justify-content-between">
+              <span>Total</span>
+              <span>{{totalFormated}}</span>
+            </h5>
+             <form method="post" action="/cart/place">
+             {{#if logged_in}}{{else}}Email:{{/if}}
+             <input type={{#if logged_in}}"hidden"{{else}}"text"{{/if}} id="guest_email" name="guest_email"  {{#if logged_in}}{{else}}required{{/if}}/>
+              <button
+                type="submit"
+                class="btn btn-primary w-100 mt-3"
+                title=" Proceed to Checkout"
+              >
+                Proceed to Checkout
+              </button>
+               </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  {{else}}
+    <div class="alert alert-info">
+      Your cart is empty.
+      <a href="/" class="alert-link">Let`s find you some new films!</a>
+    </div>
+  {{/if}}
+</div>

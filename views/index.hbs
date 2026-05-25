@@ -1,3 +1,59 @@
-<div>
-    
+<div class="container mt-4">
+<h1>This week:  </h1>
+
+    {{#each films}}
+        <div class="row border-bottom py-4">
+
+            <!-- Poster -->
+            <div class="col-md-2">
+                <img
+                    src="https://placehold.co/180x260?text={{title}}"
+                    class="img-fluid rounded shadow-sm"
+                    alt="{{title}}"
+                >
+            </div>
+
+            <!-- Movie info -->
+            <div class="col-md-10">
+
+                <h3 class="fw-bold text-uppercase mb-2">
+                    {{title}}
+                </h3>
+
+                <div class="text-muted mb-3">
+                    Director: {{director}}
+                    |
+                    {{duration}} min
+                </div>
+
+                <!-- FORMATS -->
+                {{#each filmFormat}}
+
+                    <div class="mb-4 p-3 bg-light rounded">
+
+                        <!-- Format title -->
+                        <h5 class="fw-bold text-uppercase mb-3">
+                            {{seansFormat}}
+                        </h5>
+
+                        <!-- Showtimes -->
+
+                        <!-- Language -->
+                        <div class="text-secondary small">
+                            {{dubbing}}
+                        </div>
+                         <a class="text-secondary small" href="/showtime/ff/{{id}}">
+                          Look for seans
+                         </a>
+
+
+                    </div>
+
+                {{/each}}
+
+            </div>
+
+        </div>
+    {{/each}}
+
 </div>

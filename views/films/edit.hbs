@@ -56,7 +56,8 @@
   </div>
   <div>
     <label>Dubbing:</label><br>
-    <input type="text" name="dubbing" required>
+    <input type="text" name="dubbing"  id="dubbingInput" required>
+    <div id="dubbingSuggestions" class="list-group"></div>
   </div>
   <button type="submit" class="btn-primary">Add Format</button>
 </form>
@@ -67,3 +68,34 @@
 </form>
 
 <p><a href="{{backUrl}}">Back to Film</a></p>
+<script>
+  const dubbingInput = document.getElementById('dubbingInput');
+  const suggestions = document.getElementById('dubbingSuggestions');
+
+  dubbingInput.addEventListener('input', async () => {
+    const query = dubbingInput.value;
+
+    if (!query) {
+        suggestions.innerHTML = '';
+        return;
+    }
+
+    const res = await fetch(`/film/suggestdubbing?q=${query}`);
+    const langueges = await res.json();
+
+    suggestions.innerHTML = '';
+    langueges.forEach(language => {
+        const item = document.createElement('button');
+        item.className = 'list-group-item list-group-item-action';
+        item.textContent = language;
+
+        item.onclick = () => selectLanguage(language);
+
+        suggestions.appendChild(item);
+    });
+});
+async function selectLanguage(language) {
+    dubbingInput.value = language;
+    suggestions.innerHTML = '';
+}
+</script>

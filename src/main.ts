@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 import { join } from 'node:path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as hbs from 'hbs';
+import { AllExceptionsFilter } from './http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -13,6 +14,7 @@ async function bootstrap() {
   app.setBaseViewsDir(join(__dirname, '..', 'views'));
   app.set('view options', { layout: 'layouts/main' });
   app.setViewEngine('hbs');
+  app.useGlobalFilters(new AllExceptionsFilter());
   process.on('uncaughtException', (err) => {
     console.error('UNCAUGHT EXCEPTION:', err);
   });
@@ -30,5 +32,20 @@ async function bootstrap() {
   hbs.handlebars.registerHelper('isMiddle', (seatIndex, total) => {
     return seatIndex === Math.floor(total / 2);
   });
+
+  hbs.handlebars.registerHelper('eq', (lhs, rhs) => {
+    return lhs === rhs;
+  });
+  hbs.handlebars.registerHelper('formatHour', function (date: string) {
+    const d = new Date(date);
+
+    return d.toLocaleTimeString('pl-PL', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  });
+  // hbs.handlebars.registerHelper('in', (lhs: any[], rhs) => {
+  //   return lhs.includes(rhs);
+  // });
 }
 bootstrap();

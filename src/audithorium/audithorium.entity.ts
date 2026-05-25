@@ -1,4 +1,5 @@
-import { SeansFormat } from 'src/films/filmFormat.entity';
+import { SeansFormat } from 'src/films/seansFomat.enum';
+import { Showtime } from 'src/showtime/showtime.entity';
 import {
   Column,
   Entity,
@@ -22,6 +23,9 @@ export class Audithorium {
 
   @Column()
   number_of_seats_in_row!: number;
+
+  @OneToMany(() => Showtime, (showtime) => showtime.audithorium)
+  showtimes?: Showtime[];
 
   @OneToMany(
     () => AudithoriumFormat,

@@ -4,15 +4,11 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { Film } from './film.entity';
-
-export enum SeansFormat {
-  IMAX = 'IMAX',
-  F2D = '2D',
-  F3D = '3D',
-  F4DX = '4DX',
-}
+import { Showtime } from 'src/showtime/showtime.entity';
+import { SeansFormat } from './seansFomat.enum';
 
 @Entity()
 export class FilmFormat {
@@ -33,4 +29,7 @@ export class FilmFormat {
 
   @Column()
   dubbing!: string;
+
+  @OneToMany(() => Showtime, (showtime) => showtime.filmFormat)
+  showtimes?: Showtime[];
 }

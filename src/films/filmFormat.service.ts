@@ -1,7 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FilmFormat, SeansFormat } from './filmFormat.entity';
+import { FilmFormat } from './filmFormat.entity';
+import { SeansFormat } from './seansFomat.enum';
 
 @Injectable()
 export class FilmFormatService {
@@ -58,5 +59,21 @@ export class FilmFormatService {
     if (result.affected === 0) {
       throw new NotFoundException('Film format not found');
     }
+  }
+
+  async getLanguages(language?: string) {
+    const query = this.filmFormatRepository
+      .createQueryBuilder('filmFormat')
+      .select('DISTINCT filmFormat.dubbing', 'dubbing');
+
+    if (language) {
+      query.where('filmFormat.dubbing ILIKE :language', {
+        language: `%${language}%`,
+      });
+    }
+
+    const result = await query.getRawMany<{ dubbing: string }>();
+
+    return result.map((item) => item.dubbing);
   }
 }

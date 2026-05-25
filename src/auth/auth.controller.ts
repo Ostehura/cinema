@@ -14,8 +14,7 @@ import type { Response } from 'express';
 import { JwtAuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 import { OptionalJwtAuthGuard } from './optionalauth.guard';
-import { User } from 'src/users/user.entity';
-import type { RequestWithUser } from 'src/helper/requestWIthUser';
+import type { RequestWithUser, UserPayload } from 'src/helper/requestWIthUser';
 
 @Controller('auth')
 export class AuthController {
@@ -29,7 +28,7 @@ export class AuthController {
   async signUpPage() {}
 
   @UseGuards(OptionalJwtAuthGuard)
-  @Redirect('/')
+  @Redirect('/cart/merge')
   @Post('login')
   async login(
     @Body('email') email: string,
@@ -57,7 +56,7 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
-  getProfile(@Request() req: RequestWithUser): User {
+  getProfile(@Request() req: RequestWithUser): UserPayload {
     if (!req.user) {
       throw new UnauthorizedException('User have no access to page!');
     }
