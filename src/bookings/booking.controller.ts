@@ -9,7 +9,6 @@ import {
   Render,
   Redirect,
   Request,
-  Delete,
   UnauthorizedException,
 } from '@nestjs/common';
 import { BookingService } from './booking.service';
@@ -150,7 +149,7 @@ export class BookingController {
     return { url: '/booking' };
   }
 
-  @Delete(':id')
+  @Post(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.CUSTOMER)
   async deleteBooking(
