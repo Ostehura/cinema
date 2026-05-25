@@ -22,6 +22,7 @@ import { CartItem, TicketType } from './cart.entity';
 import { CartService } from './cart.service';
 import { Money } from 'src/helper/money';
 import { BookingService } from 'src/bookings/booking.service';
+import { addMinutes } from 'src/helper/time';
 
 function TicketFare(ticketType: TicketType) {
   return ticketType == TicketType.FULL ? 1 : 0.8;
@@ -53,6 +54,12 @@ export class CartController {
     if (!cart || !cart.cartItems) {
       return { id: -1, totalFormated: new Money(0, 'PLN').toString() };
     }
+    if (
+      cart.expirationTime &&
+      addMinutes(cart.expirationTime, 5) < new Date()
+    ) {
+      return { id: -1, totalFormated: new Money(0, 'PLN').toString() };
+    }
     let total = new Money(0, 'PLN');
     for (let i = 0; i < cart.cartItems.length; i++) {
       total = total.add(
@@ -63,6 +70,7 @@ export class CartController {
     }
     const res: CartViewDto = {
       id: cart.id,
+      expirationTime: cart.expirationTime ? cart.expirationTime.toString() : '',
       totalFormated: total.toString(),
       cartItems: cart.cartItems.map((item: CartItem) => {
         const cartItemFormated: CartItemViewDto = {
@@ -138,6 +146,13 @@ export class CartController {
     if (!cart || !cart.cartItems) {
       return { id: -1, totalFormated: new Money(0, 'PLN').toString() };
     }
+    if (
+      cart.expirationTime &&
+      addMinutes(cart.expirationTime, 5) < new Date()
+    ) {
+      return { id: -1, totalFormated: new Money(0, 'PLN').toString() };
+    }
+
     let total = new Money(0, 'PLN');
     for (let i = 0; i < cart.cartItems.length; i++) {
       total = total.add(

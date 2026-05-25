@@ -235,7 +235,6 @@ export class ShowtimeController {
       filters,
     );
     const languages = await this.filmFormatService.getLanguages();
-    console.log(languages);
     return {
       days: weekDates,
       selectedDay: rowDate,

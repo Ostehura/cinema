@@ -50,6 +50,7 @@ export class CartViewDto {
   id!: number;
   cartItems?: CartItemViewDto[];
   totalFormated!: string;
+  expirationTime?: string;
 }
 export class CartItemDeleteDto {
   @Type(() => Number)

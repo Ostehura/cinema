@@ -24,9 +24,11 @@ import { BookingModule } from './bookings/booking.module';
 import { CartModule } from './cart/cart.module';
 import { Cart, CartItem } from './cart/cart.entity';
 import { AdminModule } from './admin/admin.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',

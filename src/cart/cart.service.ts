@@ -2,13 +2,16 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IsNull, Not, Repository } from 'typeorm';
+import { IsNull, LessThan, Not, Repository } from 'typeorm';
 import { Cart, CartItem } from './cart.entity';
 import { CartDto, CartUpdateDto } from './cart.dto';
+import { addMinutes } from 'src/helper/time';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class CartService {
@@ -104,6 +107,10 @@ export class CartService {
       row: product.row,
     });
     await this.cartItemRepository.insert(item);
+    await this.cartRepository.update(
+      { id: cart.id },
+      { expirationTime: addMinutes(new Date(), 20) },
+    );
     return item;
   }
 
@@ -142,7 +149,10 @@ export class CartService {
         { cartId: userCart.id },
       );
     }
-
+    await this.cartRepository.update(
+      { id: userCart.id },
+      { expirationTime: guestCart.expirationTime },
+    );
     await this.deleteGuestCart(guestCart.guestId);
   }
   async addOrUpdateItem(cartId: number, product: CartDto) {
@@ -272,5 +282,17 @@ export class CartService {
       return seats;
     }
     return [] as CartItem[];
+  }
+
+  private readonly logger = new Logger(CartService.name);
+
+  @Cron(CronExpression.EVERY_5_MINUTES)
+  async clearOldCarts() {
+    const carts = await this.cartRepository.find({
+      where: { expirationTime: LessThan(addMinutes(new Date(), -5)) },
+    });
+    for (let i = 0; i < carts.length; i++) {
+      await this.cartItemRepository.delete({ cartId: carts[i].id });
+    }
   }
 }

@@ -286,7 +286,6 @@ timeline.addEventListener('click', (e) => {
     // show marker
     selection.style.display = 'block';
     selection.style.top = (y - 2) + 'px';
-    console.log((selectedMovie.duration / 60) * HOUR_HEIGHT + 'px');
     selection.style.height = (selectedMovie.duration / 60) * HOUR_HEIGHT + 'px';
 
     selectedTimeText.innerText = time;
