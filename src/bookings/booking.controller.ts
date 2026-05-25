@@ -46,12 +46,14 @@ export class BookingController {
 
 
 
-   @Get('view')
-   @Render('bookings/view')
-   async view(){
-    const bookings = await this.bookingService.findAll();
-    return bookings
-   }
+    @Get('view')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(UserRole.ADMIN)
+    @Render('bookings/view')
+    async view(){
+     const bookings = await this.bookingService.findAll();
+     return { bookings };
+    }
 
    @Get('user/:userId')
    @UseGuards(JwtAuthGuard, RolesGuard)

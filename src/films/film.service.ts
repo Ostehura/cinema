@@ -3,6 +3,7 @@ import { NotFoundException } from '@nestjs/common';
 import { Between, ILike, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { getDateEnd, getDateStart } from 'src/showtime/helper';
+import { truncate } from 'fs';
 
 export class FilmService {
   constructor(
@@ -43,7 +44,7 @@ export class FilmService {
   async findById(id: string): Promise<Film> {
     const film = await this.filmRepository.findOne({
       where: { id },
-      relations: { filmFormat: true },
+      relations: { filmFormat: {showtimes: true} },
     });
     if (!film) {
       throw new NotFoundException('Film not found');

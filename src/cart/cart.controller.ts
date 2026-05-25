@@ -172,17 +172,17 @@ export class CartController {
     return res;
   }
 
-  @Post('place')
-  @Redirect('/booking/my-booking')
-  @UseGuards(OptionalJwtAuthGuard)
-  async PlaceOrder(
-    @Req() req: RequestWithUser,
-    @Body() body: { guest_email?: string },
-  ) {
-    return await this.bookingService.placeBooking(
-      req.user?.userId ?? null,
-      req.cookies.guest_id,
-      body.guest_email ?? null,
-    );
-  }
+   @Post('place')
+   @Redirect('/booking/my-bookings')
+   @UseGuards(OptionalJwtAuthGuard)
+   async PlaceOrder(
+     @Req() req: RequestWithUser,
+     @Body() body: { guest_email?: string },
+   ) {
+     return await this.bookingService.placeBooking(
+       req.user?.userId ?? null,
+       req.cookies.guest_id,
+       body.guest_email ?? null,
+     );
+   }
 }

@@ -18,6 +18,7 @@ import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { Roles } from 'src/auth/roles.decorator';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { OptionalJwtAuthGuard } from 'src/auth/optionalauth.guard';
+import { Admin } from 'typeorm';
 
 @Controller('film')
 export class FilmController {
@@ -30,22 +31,30 @@ export class FilmController {
     return await this.filmService.searchFilmsByName(query);
   }
 
-   @Get()
-   @UseGuards(OptionalJwtAuthGuard)
+   @Get("admin")
+   @UseGuards(JwtAuthGuard, RolesGuard )
+   @Roles(UserRole.ADMIN)  
    @Render('films/index')
    async listFilms() {
      const films = await this.filmService.findAll();
      return { films, activePage: '/film' };
    }
 
-  @Get('view/:id')
-  @UseGuards(OptionalJwtAuthGuard)
-  @Render('films/view')
-  async viewFilm(@Param('id') id: string) {
-    const film = await this.filmService.findById(id);
-    const formats = await this.filmFormatService.findByFilmId(id);
-    return { film, formats, backUrl: '/film' };
-  }
+   @Get()
+   @UseGuards(OptionalJwtAuthGuard)
+   @Render('films/user')
+   async listallFilms() {
+     const films = await this.filmService.findAll();
+     return { films, activePage: '/films/user' };
+   }
+
+   @Get('view/:id')
+   @UseGuards(OptionalJwtAuthGuard)
+   @Render('films/view')
+   async viewFilm(@Param('id') id: string) {
+     const film = await this.filmService.findById(id);
+     return { film, backUrl: '/film' };
+   }
 
   @Get('new')
   @UseGuards(JwtAuthGuard, RolesGuard)

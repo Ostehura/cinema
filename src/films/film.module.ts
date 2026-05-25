@@ -7,6 +7,8 @@ import { Film } from './film.entity';
 import { FilmFormat } from './filmFormat.entity';
 import { BookingModule } from '../bookings/booking.module';
 
+
+
 @Module({
   imports: [TypeOrmModule.forFeature([Film, FilmFormat]), BookingModule],
   controllers: [FilmController, FilmFormatController],

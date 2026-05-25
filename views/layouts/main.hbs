@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cinema </title>
+    <title>Movie Town</title>
     <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
@@ -11,14 +11,15 @@
     <nav class="navbar">
         <div class="container">
             <div class="navbar-brand">
-                <span>Cinema</span> Day
+                <span>Movie</span> Town
             </div>
             <div class="nav-links">
                 <a href="/" class="nav-link {{#if (eq activePage '/')}}active{{/if}}">Home</a>
-                <a href="/film/user" class="nav-link {{#if (eq activePage '/film')}}active{{/if}}">Films</a>
-                <a href="/showtime/allShowtimePage"  class="nav-link {{#if (eq activePage '/showtime/seeShowtimePage')}}active{{/if}}">Showtimes</a>
+                <a href="/film" class="nav-link {{#if (eq activePage '/film')}}active{{/if}}">Films</a>
+                <a href="/showtime" class="nav-link {{#if (eq activePage '/showtime')}}active{{/if}}">Showtimes</a>
                 {{#if user}}
-                <a href="/booking/my-bookings" class="nav-link {{#if (eq activePage '/booking/view')}}active{{/if}}">My Bookings</a>
+                <a href="/booking/my-bookings" class="nav-link {{#if (eq activePage '/booking/my-bookings')}}active{{/if}}">My Bookings</a>
+                <a href="/auth/logout" class="nav-link {{#if (eq activePage '/auth/logout')}}active{{/if}}">Logout</a>
                 {{else}}
                 <a href="/auth/login" class="nav-link {{#if (eq activePage '/auth/login')}}active{{/if}}">Login</a>
                 <a href="/auth/register" class="nav-link {{#if (eq activePage '/auth/register')}}active{{/if}}">Register</a>
@@ -38,22 +39,28 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
-                    <h3>About Cinema</h3>
+                    <h3>About Movie Town</h3>
                     <p>Experience movies like never before with state-of-the-art technology and luxurious comfort.</p>
                 </div>
                 <div class="footer-section">
                     <h3>Quick Links</h3>
                     <ul>
-                        <li><a href="/film">Now Showing</a></li>
+                        <li><a href="/film/user">Now Showing</a></li>
                         <li><a href="/auth/login">Login</a></li>
                         <li><a href="/auth/register">Register</a></li>
-                        <li><a href="/cart">Concessions</a></li>
                     </ul>
                 </div>
-    
+                <div class="footer-section">
+                    <h3>Contact Us</h3>
+                    <ul>
+                        <li>info@movietown.com</li>
+                        <li>555-123-444</li>
+                        <li>123 Movie Lane, Movie</li>
+                    </ul>
+                </div>
             </div>
             <div class="footer-bottom">
-                <p>© {{year}} Cinema. All rights reserved.</p>
+                <p>© {{year}} Movie Town. All rights reserved.</p>
             </div>
         </div>
     </footer>

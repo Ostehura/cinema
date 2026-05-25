@@ -3,24 +3,36 @@
 <p><strong>Duration:</strong> {{film.duration}} minutes</p>
 <p><strong>Description:</strong> {{film.description}}</p>
 
-<h2>Film Formats</h2>
+<h2>Available Showtimes</h2>
 {{#if formats.length}}
-<table>
-  <thead>
-    <tr>
-      <th>Format</th>
-      <th>Dubbing</th>
-    </tr>
-  </thead>
-  <tbody>
-    {{#each formats}}
-    <tr>
-      <td>{{this.seansFormat}}</td>
-      <td>{{this.dubbing}}</td>
-    </tr>
+{{#each formats}}
+<div class="showtime-card">
+  <div class="showtime-header">
+    <h3>{{this.seansFormat}} - {{this.dubbing}}</h3>
+  </div>
+  <div class="showtime-list">
+    {{#if ../showtimes}}
+    {{#each ../showtimes}}
+    {{#if (eq this.filmFormat.id @../formats.[@index].id)}}
+    <div class="showtime-item">
+      <div class="showtime-details">
+        <p><strong>Start Time:</strong> {{this.starttime}}</p>
+        <p><strong>End Time:</strong> {{this.endtime}}</p>
+        <p><strong>Auditorium:</strong> {{this.audithorium.name}}</p>
+        <p><strong>Price:</strong> ${{this.price}}</p>
+      </div>
+      <div class="showtime-actions">
+        <a href="/cart/add?showtimeID={{this.id}}" class="btn btn-primary">Buy Ticket</a>
+      </div>
+    </div>
+    {{/if}}
     {{/each}}
-  </tbody>
-</table>
+    {{else}}
+    <p>No showtimes available for this format.</p>
+    {{/if}}
+  </div>
+</div>
+{{/each}}
 {{else}}
 <p>No formats available.</p>
 {{/if}}

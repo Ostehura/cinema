@@ -108,6 +108,14 @@ export class ShowtimeService {
   async getShowtimesByFilmID(filmID: string): Promise<Showtime[]> {
     return await this.showtimeRepository.find({
       where: { filmFormat: { filmID: filmID } },
+      relations: ['filmFormat', 'filmFormat.film'],
+    });
+  }
+
+  async getShowtimesByFilmId(id: string): Promise<Showtime[]> {
+    return await this.showtimeRepository.find({
+      where: { filmFormat: { filmID: id } },
+      relations: ['filmFormat', 'filmFormat.film', 'audithorium'],
     });
   }
   async getShowtimesByAudithorium(audithoriumId: number): Promise<Showtime[]> {
