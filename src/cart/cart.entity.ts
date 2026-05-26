@@ -28,7 +28,7 @@ export class Cart {
   guestId?: string;
 
   @Column({ nullable: true, type: 'timestamptz' })
-  expirationTime?: Date;
+  expirationTime?: Date | null;
 
   @OneToMany(() => CartItem, (cartItem) => cartItem.cart)
   cartItems?: CartItem[];
