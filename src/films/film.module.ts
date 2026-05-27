@@ -6,6 +6,7 @@ import { FilmController, FilmFormatController } from './film.controller';
 import { Film } from './film.entity';
 import { FilmFormat } from './filmFormat.entity';
 import { BookingModule } from '../bookings/booking.module';
+import { SeansFormat } from './seansFomat.enum';
 
 
 

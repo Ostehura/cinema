@@ -203,7 +203,7 @@ export class CartController {
       body.guest_email ?? null,
     );
     if (req.user) {
-      res.redirect('/booking/my');
+      res.redirect(`/booking/${booking[0].id}`);
     } else {
       res.redirect(`/booking/${booking[0].id}`);
     }

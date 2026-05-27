@@ -37,17 +37,20 @@ export class TicketController {
     @Param('bookingId') bookingId: string,
     @Request() req: RequestWithUser,
   ) {
-    // For simplicity in this example, we'll let the service handle authorization
-    // In a real app, you'd want to check if the booking belongs to the user
     const tickets = await this.ticketService.findByBookingId(bookingId);
     return { tickets, bookingId };
   }
 
+  
   @Get(':id')
   @UseGuards(OptionalJwtAuthGuard)
+  @Render('tickets/index')
   async getTicketById(@Param('id') id: string): Promise<Ticket> {
-    return this.ticketService.findById(id);
+     const ticket = await this.ticketService.findById(id);
+     return ticket
   }
+
+  
 
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)

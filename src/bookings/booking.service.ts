@@ -21,7 +21,11 @@ export class BookingService {
 
   async findAll(): Promise<Booking[]> {
     return this.bookingRepository.find({
-      relations: ['user', 'showtime', 'tickets'],
+      relations: {
+        showtime: { filmFormat: { film: true } },
+        tickets: true,
+        user: true,
+      },
     });
   }
 

@@ -27,11 +27,11 @@
                                             <td>{{this.showtime.starttime}}</td>
                                             <td>Row {{this.seatRow}}, Seat {{this.seatNumber}}</td>
                                             <td>
-                                                <span class="badge bg-{{#if eq this.ticketType 'FULL'}}success{{else}}warning{{/if}}">
+                                                <span class="badge bg-{{#if eq this.ticketType 'full'}}success{{else}}warning{{/if}}">
                                                     {{this.ticketType}}
                                                 </span>
                                             </td>
-                                            <td>${{this.showtime.price}}{{#if (eq this.ticketType 'REDUCED')}} (Discounted){{/if}}</td>
+                                            <td>${{this.showtime.price}}{{#if (eq this.ticketType 'reduced')}} (Discounted){{/if}}</td>
                                         </tr>
                                     {{/each}}
                                 </tbody>

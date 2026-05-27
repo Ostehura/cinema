@@ -4,46 +4,38 @@
 <p><strong>Description:</strong> {{film.description}}</p>
 
 <h2>Available Showtimes</h2>
-{{#if film.filmFormat}}
-{{#each film.filmFormat}}
 
-                <div class="mb-4 p-3 bg-light rounded">
+{{#if film.filmFormat.length}}
+    {{#each film.filmFormat}}
+        <div class="mb-4 p-3 bg-light rounded">
 
-                    <!-- Format title -->
-                    <h5 class="fw-bold text-uppercase mb-3">
-                        {{seansFormat}}
-                    </h5>
+            <!-- Format title -->
+            <h5 class="fw-bold text-uppercase mb-3">
+                {{seansFormat}} - {{dubbing}}
+            </h5>
 
-                    <!-- Showtimes -->
-                    <div class="d-flex flex-wrap gap-2 mb-2">
+            <!-- Showtimes -->
+            <div class="d-flex flex-wrap gap-2 mb-2">
 
-                        {{#each showtimes}}
+                {{#if showtimes.length}}
+                    {{#each showtimes}}
+                        <a
+                            href="/showtime/show/{{id}}"
+                            class="btn btn-warning fw-bold px-4"
+                        >
+                            {{formatHour starttime}}
+                        </a>
+                    {{/each}}
+                {{else}}
+                    <p>No showtimes available.</p>
+                {{/if}}
 
-                            <a
-                                href="/showtime/show/{{id}}"
-                                class="btn btn-warning fw-bold px-4"
-                            >
-                                {{formatHour starttime}}
-                                {{!-- {{startime}} --}}
-                            </a>
+            </div>
 
-                        {{/each}}
-
-                    </div>
-
-                    <!-- Language -->
-                    <div class="text-secondary small">
-                        {{dubbing}}
-                    </div>
-                    <a class="text-secondary small" href="/showtime/ff/{{id}}"> 
-                        More show times like this
-                    </a>
-
-                </div>
-
-            {{/each}}
-
+        </div>
+    {{/each}}
 {{else}}
-<p>No formats available.</p>
+    <p>No formats available.</p>
 {{/if}}
+
 <p><a href="{{backUrl}}">Back to List</a></p>

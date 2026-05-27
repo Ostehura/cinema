@@ -9,7 +9,7 @@ import {
   Render,
   Redirect,
   Request,
-  UnauthorizedException,
+  Res,
 } from '@nestjs/common';
 import { BookingService } from './booking.service';
 import { Booking } from './booking.entity';
@@ -18,6 +18,8 @@ import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { UserRole } from '../users/user.entity';
 import { OptionalJwtAuthGuard } from 'src/auth/optionalauth.guard';
+
+import { ForbiddenException, UnauthorizedException } from '@nestjs/common';
 
 interface RequestWithUser {
   user?: { userId: string; role: string };
@@ -30,7 +32,7 @@ export class BookingController {
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
-  @Render('bookings/index')
+  @Render('booking/index')
   async listBookings(
     @Query() query: { userID: string; guestEmail: string; datetime: string },
   ) {
@@ -51,7 +53,7 @@ export class BookingController {
   @Get('search')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
-  @Render('bookings/search')
+  @Render('booking/search')
   searchForm() {
     return {};
   }
@@ -59,16 +61,25 @@ export class BookingController {
   @Get('view')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
-  @Render('bookings/view')
-  async view() {
+  @Render('booking/view')
+  async view(){
     const bookings = await this.bookingService.findAll();
     return { bookings };
+  }
+
+  @Get('error')
+  @Render('error')
+  async error() {
+    return {
+      statusCode: '403',
+      message: 'Access Forbidden: You do not have permission to perform this action or the booking cannot be deleted due to timing restrictions.'
+    };
   }
 
   @Get('user/:userId')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
-  @Render('bookings/user')
+  @Render('booking/user')
   async userBookings(@Param('userId') userId: string) {
     const bookings = await this.bookingService.findByUserId(userId);
     return { bookings, userId };
@@ -76,7 +87,7 @@ export class BookingController {
 
   @Get('my-bookings')
   @UseGuards(JwtAuthGuard)
-  @Render('bookings/user')
+  @Render('booking/user')
   async myBookings(@Request() req: RequestWithUser) {
     if (!req.user) {
       throw new Error('User not found');
@@ -86,7 +97,7 @@ export class BookingController {
   }
 
   @Get('my')
-  @Render('mybookings')
+  @Render('my-bookings')
   @UseGuards(JwtAuthGuard)
   async getUserBookings(
     @Param('userId') userId: string,
@@ -107,17 +118,24 @@ export class BookingController {
 
   @Get(':id')
   @UseGuards(OptionalJwtAuthGuard)
-  // @UseGuards(JwtAuthGuard, RolesGuard)
-  // @Roles(UserRole.ADMIN, UserRole.CUSTOMER)
-  @Render('bookings/view')
+  @Render('booking/view')
   async viewBooking(@Param('id') id: string) {
     const booking = await this.bookingService.findById(id);
     return { booking };
   }
 
+  @Get(':id')
+  @UseGuards(OptionalJwtAuthGuard)
+  @Render('booking/viewAdmin')
+  async viewBookingAdmin(@Param('id') id: string) {
+    const booking = await this.bookingService.findById(id);
+    return { booking };
+  }
+
+
   @Get('new')
   @UseGuards(JwtAuthGuard)
-  @Render('bookings/new')
+  @Render('booking/new')
   newBookingForm() {
     return {};
   }
@@ -155,35 +173,46 @@ export class BookingController {
   async deleteBooking(
     @Param('id') id: string,
     @Request() req: RequestWithUser,
-  ): Promise<{ message: string }> {
-    const booking = await this.bookingService.findById(id);
-    if (!req.user) {
-      throw new Error('User have no access to page!');
-    }
+    @Res() res,
+  ) {
+    try {
+      const booking = await this.bookingService.findById(id);
 
-    // Check if booking can be deleted (must be at least 4 hours before showtime)
-    if (booking.showtime) {
-      const showtime = new Date(booking.showtime.starttime);
-      const currentTime = new Date();
-      const timeDifference = showtime.getTime() - currentTime.getTime();
-      const hoursDifference = timeDifference / (1000 * 60 * 60);
-
-      if (hoursDifference < 4) {
-        throw new Error(
-          'Booking cannot be deleted less than 4 hours before showtime',
-        );
+      if (!req.user) {
+        throw new UnauthorizedException();
       }
-    }
 
-    if (String(req.user.role) === String(UserRole.ADMIN)) {
-      await this.bookingService.delete(id);
-    } else if (
-      String(req.user.role) === String(UserRole.CUSTOMER) &&
-      booking.userID === req.user.userId
-    ) {
-      await this.bookingService.delete(id);
-    }
+      if (booking.showtime) {
+        const showtime = new Date(booking.showtime.starttime);
+        const hoursDifference =
+          (showtime.getTime() - Date.now()) / (1000 * 60 * 60);
 
-    return { message: 'Booking deleted successfully' };
+        if (hoursDifference < 4) {
+          throw new ForbiddenException(
+            'Booking cannot be deleted less than 4 hours before showtime',
+          );
+        }
+      }
+
+      if (
+        req.user.role === UserRole.ADMIN ||
+        (req.user.role === UserRole.CUSTOMER && booking.userID === req.user.userId)
+      ) {
+        await this.bookingService.delete(id);
+      } else {
+        throw new ForbiddenException('You do not have permission to delete this booking');
+      }
+      
+      if (req.user.role === UserRole.ADMIN) {
+        return res.redirect('/booking/view');
+      } else {
+        return res.redirect('/booking/my-bookings');
+      }
+    } catch (err) {
+      return res.redirect(`/booking/error`);
+    }
   }
+
+
 }
+
