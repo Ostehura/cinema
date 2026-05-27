@@ -24,13 +24,23 @@ export class TicketService {
   async findById(id: string): Promise<Ticket> {
     const ticket = await this.ticketRepository.findOne({
       where: { id },
-      relations: ['booking', 'showtime'],
+      relations: [
+        'booking',
+        'showtime',
+        'showtime.filmFormat',
+        'showtime.filmFormat.film',
+      ],
     });
     if (!ticket) {
       throw new NotFoundException('Ticket not found');
     }
     return ticket;
   }
+
+  errorPage(){
+    return "Unable to delete booking"
+  }
+
 
   async create(
     bookingID: string,

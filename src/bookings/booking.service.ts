@@ -21,7 +21,11 @@ export class BookingService {
 
   async findAll(): Promise<Booking[]> {
     return this.bookingRepository.find({
-      relations: ['user', 'showtime', 'tickets'],
+      relations: {
+        showtime: { filmFormat: { film: true } },
+        tickets: true,
+        user: true,
+      },
     });
   }
 
@@ -54,11 +58,14 @@ export class BookingService {
     return booking;
   }
 
-  async searchBookings(filter: {
-    userID?: string;
-    guestEmail?: string;
-    datetime?: Date;
-  }): Promise<Booking[]> {
+  async searchBookings(
+    filter: {
+      userID?: string;
+      user?: { email?: string };
+      guestEmail?: string;
+      datetime?: Date;
+    }[],
+  ): Promise<Booking[]> {
     console.log(filter);
     const query = this.bookingRepository.find({ where: filter });
     return query;

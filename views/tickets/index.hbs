@@ -1,0 +1,56 @@
+<div class="container my-5 d-flex justify-content-center">
+  <div class="card shadow-lg p-4" style="max-width: 500px; border-radius: 15px;">
+
+    <h2 class="d-inline-flex align-items-center justify-content-between bg-black text-white px-2 py-1 rounded" style="min-width: 250px;">
+        <strong>
+        <span class="text-danger">Movie</span><span class="text-white">Town</span>
+        </strong>
+    </h2>
+    <h3 class="text-center mb-3"> Your Ticket</h3>
+    <hr/>
+
+    <p><strong>Ticket ID:</strong> {{id}}</p>
+
+    <p>
+      {{#if booking.userID}}
+        <strong>UserID:</strong>{{booking.userID}}
+      {{else}}
+        <strong>Email:</strong>{{booking.guestEmail}}
+      {{/if}}
+    </p>
+
+    <p><strong>Movie:</strong> {{showtime.filmFormat.film.title}}</p>
+    <p><strong>Format:</strong> {{showtime.filmFormat.seansFormat}}</p>
+    <p><strong>Showtime:</strong> {{formatDate showtime.starttime}} at {{formatHour showtime.starttime}}</p>
+
+    <p><strong>Seat:</strong> Row {{seatRow}}, Seat {{seatNumber}}</p>
+
+    <p>
+      <strong>Type:</strong>
+      {{#if (eq ticketType 'full')}}
+        <span class="badge bg-success">{{ticketType}}</span>
+      {{else}}
+        <span class="badge bg-warning">{{ticketType}}</span>
+      {{/if}}
+    </p>
+
+    <p><strong>Price:</strong> ${{showtime.price}}{{#if (eq ticketType 'reduced')}} (Discounted){{/if}}</p>
+    <td></td>
+    <div class="text-center mt-4">
+      <canvas id="qrcode"></canvas>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
+<script>
+  const ticketData = "{{id}}|{{seatRow}}|{{seatNumber}}|{{showtimeID}}";
+
+  QRCode.toCanvas(document.getElementById('qrcode'), ticketData, {
+    width: 150
+  });
+</script>
+
+

@@ -9,6 +9,8 @@ import {
 import { Booking } from '../bookings/booking.entity';
 import { Showtime } from '../showtime/showtime.entity';
 
+
+
 export enum TicketType {
   FULL = 'full',
   REDUCED = 'reduced',
