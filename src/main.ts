@@ -31,6 +31,18 @@ async function bootstrap() {
     return seatIndex === Math.floor(total / 2);
   });
 
+  hbs.handlebars.registerHelper('formatDate', function (date: string) {
+    const d= new Date(date);
+
+    return d.toLocaleDateString('pl-PL', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  });
+
+
+
   hbs.handlebars.registerHelper('formatHour', function (date: string) {
     const d = new Date(date);
 

@@ -43,7 +43,37 @@
 
             {{/each}}
 
+{{#if film.filmFormat.length}}
+    {{#each film.filmFormat}}
+        <div class="mb-4 p-3 bg-light rounded">
+
+            <!-- Format title -->
+            <h5 class="fw-bold text-uppercase mb-3">
+                {{seansFormat}} - {{dubbing}}
+            </h5>
+
+            <!-- Showtimes -->
+            <div class="d-flex flex-wrap gap-2 mb-2">
+
+                {{#if showtimes.length}}
+                    {{#each showtimes}}
+                        <a
+                            href="/showtime/show/{{id}}"
+                            class="btn btn-warning fw-bold px-4"
+                        >
+                            {{formatHour starttime}}
+                        </a>
+                    {{/each}}
+                {{else}}
+                    <p>No showtimes available.</p>
+                {{/if}}
+
+            </div>
+
+        </div>
+    {{/each}}
 {{else}}
-<p>No formats available.</p>
+    <p>No formats available.</p>
 {{/if}}
+
 <p><a href="{{backUrl}}">Back to List</a></p>
