@@ -36,17 +36,30 @@ export class BookingController {
   async listBookings(
     @Query() query: { userID: string; guestEmail: string; datetime: string },
   ) {
-    const bookings = await this.bookingService.searchBookings({
-      userID: query.userID && query.userID != '' ? query.userID : undefined,
-      guestEmail:
-        query.guestEmail && query.guestEmail != ''
-          ? query.guestEmail
-          : undefined,
-      datetime:
-        query.datetime && query.datetime != ''
-          ? new Date(query.datetime)
-          : undefined,
-    });
+    const bookings = await this.bookingService.searchBookings([
+      {
+        userID: query.userID && query.userID != '' ? query.userID : undefined,
+        guestEmail:
+          query.guestEmail && query.guestEmail != ''
+            ? query.guestEmail
+            : undefined,
+        datetime:
+          query.datetime && query.datetime != ''
+            ? new Date(query.datetime)
+            : undefined,
+      },
+      {
+        userID: query.userID && query.userID != '' ? query.userID : undefined,
+        user:
+          query.guestEmail && query.guestEmail
+            ? { email: query.guestEmail }
+            : undefined,
+        datetime:
+          query.datetime && query.datetime != ''
+            ? new Date(query.datetime)
+            : undefined,
+      },
+    ]);
     return { bookings, activePage: '/booking' };
   }
 
@@ -62,17 +75,18 @@ export class BookingController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @Render('booking/view')
-  async view(){
+  async view() {
     const bookings = await this.bookingService.findAll();
     return { bookings };
   }
 
   @Get('error')
   @Render('error')
-  async error() {
+  error() {
     return {
       statusCode: '403',
-      message: 'Access Forbidden: You do not have permission to perform this action or the booking cannot be deleted due to timing restrictions.'
+      message:
+        'Access Forbidden: You do not have permission to perform this action or the booking cannot be deleted due to timing restrictions.',
     };
   }
 
@@ -131,7 +145,6 @@ export class BookingController {
     const booking = await this.bookingService.findById(id);
     return { booking };
   }
-
 
   @Get('new')
   @UseGuards(JwtAuthGuard)
@@ -196,13 +209,16 @@ export class BookingController {
 
       if (
         req.user.role === UserRole.ADMIN ||
-        (req.user.role === UserRole.CUSTOMER && booking.userID === req.user.userId)
+        (req.user.role === UserRole.CUSTOMER &&
+          booking.userID === req.user.userId)
       ) {
         await this.bookingService.delete(id);
       } else {
-        throw new ForbiddenException('You do not have permission to delete this booking');
+        throw new ForbiddenException(
+          'You do not have permission to delete this booking',
+        );
       }
-      
+
       if (req.user.role === UserRole.ADMIN) {
         return res.redirect('/booking/view');
       } else {
@@ -212,7 +228,4 @@ export class BookingController {
       return res.redirect(`/booking/error`);
     }
   }
-
-
 }
-
