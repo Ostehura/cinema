@@ -140,10 +140,15 @@
   const seansId = {{{id}}};
   const reserved = {{{yourSeats}}};
   const taken = {{{takenSeats}}};
+  const startTime = new Date("{{starttime}}");
   async function  sendRequest(node)
   {
     const [row, seat] = node.id.split("_");
     const obj = {row: row,column : seat, seansId : seansId }
+    if(startTime < new Date()){
+      alert("The film has alredy started. Can not add to cart!");
+      return;
+    }
 
     await fetch(`/cart/add`,{method:'POST',  headers: {
       'Content-Type': 'application/json'

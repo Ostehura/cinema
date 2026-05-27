@@ -64,7 +64,11 @@
         showsContainer.innerHTML = '';
         shows.forEach(show => {
             const start = timeToMinutes(DateToTimeString(new Date(show.starttime)));
-            const end = timeToMinutes(DateToTimeString(new Date(show.endtime)));
+            let end = timeToMinutes(DateToTimeString(new Date(show.endtime)));
+            if(new Date(show.endtime).getDate() - new Date(show.starttime).getDate() > 0)
+            {
+                end = timeToMinutes ("23:59");
+            }
             const top = ((start - START_HOUR * 60) / 60) * HOUR_HEIGHT;
             const height = ((end - start) / 60) * HOUR_HEIGHT;
 

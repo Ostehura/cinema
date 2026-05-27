@@ -34,7 +34,7 @@ export class BookingController {
   @Roles(UserRole.ADMIN)
   @Render('booking/index')
   async listBookings(
-    @Query() query: { userID: string; guestEmail: string; datetime: string },
+    @Query() query: { userID?: string; guestEmail?: string; datetime?: string },
   ) {
     const bookings = await this.bookingService.searchBookings([
       {

@@ -7,18 +7,27 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IsNull, LessThan, Not, Repository } from 'typeorm';
+import { DataSource, IsNull, LessThan, Not, Repository } from 'typeorm';
 import { Cart, CartItem } from './cart.entity';
 import { CartDto, CartUpdateDto } from './cart.dto';
 import { addMinutes } from 'src/helper/time';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { Showtime } from 'src/showtime/showtime.entity';
 
 @Injectable()
 export class CartService {
-  @InjectRepository(Cart)
-  private readonly cartRepository!: Repository<Cart>;
-  @InjectRepository(CartItem)
-  private readonly cartItemRepository!: Repository<CartItem>;
+  constructor(
+    @InjectRepository(Cart)
+    private readonly cartRepository: Repository<Cart>,
+    @InjectRepository(CartItem)
+    private readonly cartItemRepository: Repository<CartItem>,
+    private dataSource: DataSource,
+  ) {}
+  // private dataSource: DataSource;
+  // @InjectRepository(Cart)
+  // private readonly cartRepository!: Repository<Cart>;
+  // @InjectRepository(CartItem)
+  // private readonly cartItemRepository!: Repository<CartItem>;
   async findOrCreateUserCart(userId: string) {
     let cart = await this.cartRepository.findOne({
       where: { user: { id: userId } },
@@ -78,6 +87,14 @@ export class CartService {
       throw new UnauthorizedException();
     }
 
+    const showtime = await this.dataSource.manager.findOne(Showtime, {
+      where: { id: product.seansId },
+      select: { starttime: true },
+    });
+    if (!showtime) {
+      throw new BadRequestException('Invalid showtime');
+    }
+
     const inCart = await this.cartItemRepository.findOne({
       where: {
         cartId: cart.id,
@@ -89,6 +106,9 @@ export class CartService {
     if (inCart) {
       await this.cartItemRepository.delete(inCart);
       return;
+    }
+    if (showtime.starttime < new Date()) {
+      throw new BadRequestException('Can not book seat in old showtime');
     }
     const reserved = await this.cartItemRepository.findOne({
       where: {
@@ -288,11 +308,19 @@ export class CartService {
 
   @Cron(CronExpression.EVERY_5_MINUTES)
   async clearOldCarts() {
+    this.logger.log('Run clear task');
     const carts = await this.cartRepository.find({
       where: { expirationTime: LessThan(addMinutes(new Date(), -5)) },
     });
     for (let i = 0; i < carts.length; i++) {
       await this.cartItemRepository.delete({ cartId: carts[i].id });
+      await this.cartRepository
+        .createQueryBuilder()
+        .update()
+        .set({ expirationTime: null })
+        .where('id = :id', { id: carts[i].id })
+        .execute();
     }
+    this.logger.debug('Were cleaned:', carts.length);
   }
 }

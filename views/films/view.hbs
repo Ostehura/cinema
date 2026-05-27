@@ -4,6 +4,44 @@
 <p><strong>Description:</strong> {{film.description}}</p>
 
 <h2>Available Showtimes</h2>
+{{#if film.filmFormat}}
+{{#each film.filmFormat}}
+
+                <div class="mb-4 p-3 bg-light rounded">
+
+                    <!-- Format title -->
+                    <h5 class="fw-bold text-uppercase mb-3">
+                        {{seansFormat}}
+                    </h5>
+
+                    <!-- Showtimes -->
+                    <div class="d-flex flex-wrap gap-2 mb-2">
+
+                        {{#each showtimes}}
+
+                            <a
+                                href="/showtime/show/{{id}}"
+                                class="btn btn-warning fw-bold px-4 {{#if (futureDate starttime)}}{{else}}disabled{{/if}}"
+                            >
+                                {{formatHour starttime}}
+                                {{!-- {{startime}} --}}
+                            </a>
+
+                        {{/each}}
+
+                    </div>
+
+                    <!-- Language -->
+                    <div class="text-secondary small">
+                        {{dubbing}}
+                    </div>
+                    <a class="text-secondary small" href="/showtime/ff/{{id}}"> 
+                        More show times like this
+                    </a>
+
+                </div>
+
+            {{/each}}
 
 {{#if film.filmFormat.length}}
     {{#each film.filmFormat}}

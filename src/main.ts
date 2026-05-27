@@ -68,6 +68,11 @@ async function bootstrap() {
     return Number(a) + Number(b);
   });
 
+  hbs.handlebars.registerHelper('futureDate', (a) => {
+    const b = new Date(a);
+    return !isNaN(b.getTime()) && b > new Date();
+  });
+
   process.on('uncaughtException', (err) => {
     console.error('UNCAUGHT EXCEPTION:', err);
   });
