@@ -58,11 +58,14 @@ export class BookingService {
     return booking;
   }
 
-  async searchBookings(filter: {
-    userID?: string;
-    guestEmail?: string;
-    datetime?: Date;
-  }): Promise<Booking[]> {
+  async searchBookings(
+    filter: {
+      userID?: string;
+      user?: { email?: string };
+      guestEmail?: string;
+      datetime?: Date;
+    }[],
+  ): Promise<Booking[]> {
     console.log(filter);
     const query = this.bookingRepository.find({ where: filter });
     return query;
